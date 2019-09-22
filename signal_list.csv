@@ -1,0 +1,15 @@
+# Version,,,,,
+1,,,,,
+# CategoryID,SignalID,Name,Units,Type,TimeoutMsec
+10,10,gps_latitude,deg,double,1000
+10,11,gps_longitude,deg,double,1000
+10,20,altitude_msl,ft,double,1000
+10,30,heading_true,deg,double,1000
+10,31,heading_mag,deg,double,1000
+10,40,att_pitch,deg,double,1000
+10,41,att_roll,deg,double,1000
+10,50,speed_ias,kts,double,1000
+10,51,speed_gs,kts,double,1000
+20,10,engine_rpm,rpm,double,1000
+20,20,oil_pressure,psi,double,1000
+20,21,oil_temperature,c,double,1000
