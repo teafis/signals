@@ -1,6 +1,6 @@
 # Version,,,,,
 1,,,,,
-# CategoryID,SignalID,Name,Units,Type,TimeoutMsec
+# CategoryID,SubID,Name,Units,Type,TimeoutMsec
 10,10,gps_latitude,deg,double,1000
 10,11,gps_longitude,deg,double,1000
 10,20,altitude_msl,ft,double,1000
