@@ -1,15 +1,16 @@
-# Version,,,,,
-1,,,,,
-# CategoryID,SubID,Name,Units,Type,TimeoutMsec
-10,10,gps_latitude,deg,double,1000
-10,11,gps_longitude,deg,double,1000
-10,20,altitude_msl,ft,double,1000
-10,30,heading_true,deg,double,1000
-10,31,heading_mag,deg,double,1000
-10,40,att_pitch,deg,double,1000
-10,41,att_roll,deg,double,1000
-10,50,speed_ias,kts,double,1000
-10,51,speed_gs,kts,double,1000
-20,10,engine_rpm,rpm,double,1000
-20,20,oil_pressure,psi,double,1000
-20,21,oil_temperature,c,double,1000
+# Version,,,,,,
+1,,,,,,
+# CategoryID,SubID,Name,Units,Type,TimeoutMsec,Resolution
+10,10,gps_latitude,deg,fixed,1000,semi2deg
+10,11,gps_longitude,deg,fixed,1000,semi2deg
+10,20,altitude_msl,ft,fixed,1000,0.01
+10,21,altitude_rate,ft/s,fixed,1000,0.01
+10,30,heading_true,deg,fixed,1000,semi2deg
+10,31,heading_mag,deg,fixed,1000,semi2deg
+10,40,att_pitch,deg,fixed,1000,semi2deg
+10,41,att_roll,deg,fixed,1000,semi2deg
+10,50,speed_ias,kts,fixed,1000,0.01
+10,51,speed_gs,kts,fixed,1000,0.01
+20,10,engine_rpm,rpm,fixed,1000,0.01
+20,20,oil_pressure,psi,fixed,1000,0.01
+20,21,oil_temperature,c,fixed,1000,0.01
