@@ -34,7 +34,7 @@ class SignalDefinition:
         self.sig_type = sig_type
         self.timeout_msec = timeout_msec
 
-    def generate_code(self) -> str:
+    def generate_cpp_code(self) -> str:
         """
         Generates C++ Code for the given packet type
         :return: C++ code for the current signal type

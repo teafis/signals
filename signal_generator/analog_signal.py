@@ -9,6 +9,7 @@ class AnalogSignalDefinition(SignalDefinition):
     """
     Class to maintain the definition for an analog signal type
     """
+
     def __init__(
             self,
             cat_id: int,
@@ -29,4 +30,11 @@ class AnalogSignalDefinition(SignalDefinition):
         """
         super().__init__(cat_id, sub_id, name, unit, sig_type, timeout_msec)
         self.resolution = resolution
+
+    def generate_cpp_code(self) -> str:
+        """
+        Generates C++ Code for the given packet type
+        :return: C++ code for the current signal type
+        """
+        raise NotImplementedError()
 
