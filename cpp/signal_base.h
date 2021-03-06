@@ -1,5 +1,5 @@
 // TeaFIS is a cockpit display for aircraft
-// Copyright (C) 2020  Ian O'Rourke
+// Copyright (C) 2021  Ian O'Rourke
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,21 +20,52 @@
 
 #include "data_common.h"
 
+#include "signal_id.h"
+
+namespace efis_signals
+{
+
 class BaseSignal
 {
 public:
-    BaseSignal(uint8_t category_id, uint8_t signal_id) :
-        category_id(category_id),
-        signal_id(signal_id)
+    BaseSignal(const SignalID& signal) :
+        from_device(0),
+        priority(0),
+        category_id(signal.category_id),
+        signal_id(signal.signal_id),
+        timestamp(0)
     {
 
     }
 
+    virtual bool serialize(DataWriter& writer) const
+    {
+        return
+                writer.add_ubyte(from_device) &&
+                writer.add_ubyte(priority) &&
+                writer.add_ubyte(category_id) &&
+                writer.add_ubyte(signal_id) &&
+                writer.add_uint(timestamp);
+    }
 
+    virtual bool deserialize(DataReader& reader)
+    {
+        return
+                reader.read_ubyte(from_device) &&
+                reader.read_ubyte(priority) &&
+                reader.read_ubyte(category_id) &&
+                reader.read_ubyte(signal_id) &&
+                reader.read_uint(timestamp);
+    }
 
 protected:
+    uint8_t from_device;
+    uint8_t priority;
     uint8_t category_id;
     uint8_t signal_id;
+    uint32_t timestamp;
 };
+
+}
 
 #endif // SIGNAL_BASE_H
