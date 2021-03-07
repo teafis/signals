@@ -180,7 +180,7 @@ class SignalList:
         first_line = True
 
         # Iterate over all parameters in the signal list
-        for line in [l for l in data.splitlines()]:
+        for line in [line for line in data.splitlines()]:
             # Ignore comment lines
             if list(line)[0] == '#':
                 continue
@@ -218,4 +218,3 @@ class SignalList:
         return SignalList(
             version=version,
             definitions=def_list)
-

@@ -18,6 +18,7 @@
 #ifndef EFIS_SIGNALS_COMMON_H
 #define EFIS_SIGNALS_COMMON_H
 
+#include <cstddef>
 #include <cstdint>
 
 namespace efis_signals

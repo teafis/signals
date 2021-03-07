@@ -34,7 +34,7 @@ class SignalFixedDefinition(SignalDefinition):
             name: str,
             unit: str,
             sig_type: str,
-            timeout_msec: int,
+            timeout_millisecond: int,
             resolution: float):
         """
         Creates a signal definition for the provided input parameters
@@ -42,10 +42,10 @@ class SignalFixedDefinition(SignalDefinition):
         :param sub_id: the signal ID for the signal
         :param unit: the unit associated with the signal
         :param sig_type: the signal type
-        :param timeout_msec: the number of milliseconds until timeout for the signal
+        :param timeout_millisecond: the number of milliseconds until timeout for the signal
         :param resolution: the resolution to multiply network data by to get the engineering data
         """
-        super().__init__(cat_id, sub_id, name, unit, sig_type, timeout_msec)
+        super().__init__(cat_id, sub_id, name, unit, sig_type, timeout_millisecond)
         self.resolution = resolution
 
     def generate_cpp_code(self) -> str:
@@ -54,4 +54,3 @@ class SignalFixedDefinition(SignalDefinition):
         :return: C++ code for the current signal type
         """
         raise NotImplementedError()
-

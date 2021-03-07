@@ -304,6 +304,3 @@ class CodegenFileCppSource(CodegenFileCpp):
         super()._print_init()
         self.lines.append('using namespace {:s};'.format(self.NAMESPACE_NAME))
         self.lines.append('')
-
-
-

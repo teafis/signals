@@ -19,6 +19,7 @@
 #define SIGNAL_ID_H
 
 #include <cstdint>
+#include <cstddef>
 #include <limits>
 
 namespace efis_signals

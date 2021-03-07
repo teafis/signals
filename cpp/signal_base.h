@@ -50,12 +50,65 @@ public:
 
     virtual bool deserialize(DataReader& reader)
     {
-        return
-                reader.read_ubyte(from_device) &&
-                reader.read_ubyte(priority) &&
-                reader.read_ubyte(category_id) &&
-                reader.read_ubyte(signal_id) &&
-                reader.read_uint(timestamp);
+        // Create a temporary variables to use in determining deserialization
+        // parameters and ability
+        uint8_t pkt_from_device;
+        uint8_t pkt_priority;
+        uint8_t pkt_category_id;
+        uint8_t pkt_signal_id;
+        uint32_t pkt_timestamp;
+
+        // Determine if each of the parameters could be read successfully
+        const bool success =
+                reader.read_ubyte(pkt_from_device) &&
+                reader.read_ubyte(pkt_priority) &&
+                reader.read_ubyte(pkt_category_id) &&
+                reader.read_ubyte(pkt_signal_id) &&
+                reader.read_uint(pkt_timestamp);
+
+        // Fail if parameters did not read correctly
+        if (!success)
+        {
+            return false;
+        }
+        // Fail if either the category or signal ID do not match the expected
+        else if (pkt_category_id != category_id || pkt_signal_id != signal_id)
+        {
+            return false;
+        }
+        // If we are timed out, then we can update the parameters to accept a new packet
+        else if (timed_out())
+        {
+            from_device = pkt_from_device;
+            priority = pkt_priority;
+            timestamp = pkt_timestamp;
+            return true;
+        }
+        // Check if the priority is greater than the current priority
+        else if (pkt_priority > priority)
+        {
+            return true;
+        }
+        // If the packet originates from the same device, check the timestamps
+        else if (pkt_from_device == from_device)
+        {
+            return pkt_timestamp >= timestamp;
+        }
+        // Otherwise return false;
+        else
+        {
+            return false;
+        }
+    }
+
+    bool timed_out() const
+    {
+        return false;
+    }
+
+    virtual size_t packet_size() const
+    {
+        return 8;
     }
 
 protected:

@@ -26,7 +26,6 @@
 namespace efis_signals
 {
 
-
 class SignalFixed : public BaseSignal
 {
 public:
@@ -92,6 +91,11 @@ public:
         {
             return false;
         }
+    }
+
+    virtual size_t packet_size() const override
+    {
+        return BaseSignal::packet_size() + 4;
     }
 
 protected:
