@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 16:25:45 UTC
+// Creation Date: 2021-03-07 17:08:58 UTC
 
 #include "signal_id.h"
 #include <string>
@@ -45,9 +45,21 @@ extern const SignalID SIGNAL_ID_ENGINE_RPM;
 extern const SignalID SIGNAL_ID_OIL_PRESSURE;
 extern const SignalID SIGNAL_ID_OIL_TEMPERATURE;
 
+/**
+ * @brief get_signal_id_for_name provides the signal ID for the provided name
+ * @param name is the name of the signal to find
+ * @param signal provides the resulting signal ID if found
+ * @return true if a signal for the given name is found
+ */
 bool get_signal_id_for_name(const std::string& name, SignalID& signal);
 
-bool get_name_for_signal_id(const SignalID& signal_id, std::string name);
+/**
+ * @brief get_signal_name_for_id provides the name of the signal
+ * @param signal_id is the signal ID to try to find a name for
+ * @param name provides the name of the signal if found
+ * @return true if a name for the given signal is found
+ */
+bool get_signal_name_for_id(const SignalID& signal_id, std::string name);
 
 }
 

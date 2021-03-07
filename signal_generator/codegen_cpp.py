@@ -64,9 +64,17 @@ def _empty_printer(*_) -> typing.List[str]:
     return list()
 
 
+def _get_find_id_func_name() -> str:
+    """
+        Provides the name of the find by name function
+        :return: the name of the get signal name by ID function
+        """
+    return 'get_signal_id_for_name'
+
+
 def _get_find_func_sig(with_namespace: bool) -> str:
     """
-    Determines the function signature for the get_signal_id_for_name function
+    Determines the function signature for the get signal by ID function
     :param with_namespace: determines if the namespace should be added
     :return: the associated function signature
     """
@@ -75,12 +83,22 @@ def _get_find_func_sig(with_namespace: bool) -> str:
     else:
         namespace_sec = ''
 
-    return 'bool {:s}get_signal_id_for_name(const std::string& name, SignalID& signal)'.format(namespace_sec)
+    return 'bool {0:s}{1:s}(const std::string& name, SignalID& signal)'.format(
+        namespace_sec,
+        _get_find_id_func_name())
+
+
+def _get_find_name_func_name() -> str:
+    """
+    Provides the name of the find by ID function
+    :return: the name of the get signal name by ID function
+    """
+    return 'get_signal_name_for_id'
 
 
 def _get_find_name_func_sig(with_namespace: bool) -> str:
     """
-    Determines the function signature for the get_name_for_signal_id function
+    Determines the function signature for the get signal name by ID function
     :param with_namespace: determines if the namespace should be added
     :return: the associated function signature
     """
@@ -89,7 +107,9 @@ def _get_find_name_func_sig(with_namespace: bool) -> str:
     else:
         namespace_sec = ''
 
-    return 'bool {:s}get_name_for_signal_id(const SignalID& signal_id, std::string name)'.format(namespace_sec)
+    return 'bool {0:s}{1:s}(const SignalID& signal_id, std::string name)'.format(
+        namespace_sec,
+        _get_find_name_func_name())
 
 
 def _generate_signal_id_hdr() -> CodegenFileCppHeader:
@@ -111,12 +131,26 @@ def _generate_signal_id_hdr() -> CodegenFileCppHeader:
 
     # Add the section for the get-id by name function
     get_by_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
-    get_by_name_sig_sec.init_list = ['{:s};'.format(_get_find_func_sig(with_namespace=False))]
+    get_by_name_sig_sec.init_list = [
+        '/**',
+        ' * @brief get_signal_id_for_name provides the signal ID for the provided name',
+        ' * @param name is the name of the signal to find',
+        ' * @param signal provides the resulting signal ID if found',
+        ' * @return true if a signal for the given name is found',
+        ' */',
+        '{:s};'.format(_get_find_func_sig(with_namespace=False))]
     codegen.add_section(section=get_by_name_sig_sec)
 
     # Add the section for the get-name function
     get_id_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
-    get_id_name_sig_sec.init_list = ['{:s};'.format(_get_find_name_func_sig(with_namespace=False))]
+    get_id_name_sig_sec.init_list = [
+        '/**',
+        ' * @brief {:s} provides the name of the signal'.format(_get_find_name_func_name()),
+        ' * @param signal_id is the signal ID to try to find a name for',
+        ' * @param name provides the name of the signal if found',
+        ' * @return true if a name for the given signal is found',
+        ' */',
+        '{:s};'.format(_get_find_name_func_sig(with_namespace=False))]
     codegen.add_section(section=get_id_name_sig_sec)
 
     # Add include parameters

@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 16:25:45 UTC
+// Creation Date: 2021-03-07 17:08:58 UTC
 
 #include "gen_signal_id.h"
 
@@ -133,7 +133,7 @@ bool efis_signals::get_signal_id_for_name(const std::string& name, SignalID& sig
     }
 }
 
-bool efis_signals::get_name_for_signal_id(const SignalID& signal_id, std::string name)
+bool efis_signals::get_signal_name_for_id(const SignalID& signal_id, std::string name)
 {
     if (signal_id == SIGNAL_ID_NULL)
     {
