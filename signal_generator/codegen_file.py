@@ -144,7 +144,7 @@ class CodegenFile:
         """
         raise NotImplementedError()
 
-    def generate_signal_list(
+    def generate_code(
             self,
             target_dir: pathlib.Path,
             signal_list: SignalList) -> None:
@@ -188,17 +188,16 @@ class CodegenFileCpp(CodegenFile):
     Class instance for a Codegen file for the C++ language
     """
 
-    # Define the default namespace name for C++
-    NAMESPACE_NAME = 'efis_signals'
-
-    def __init__(self, base_name: str):
+    def __init__(self, base_name: str, namespace: str):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
+        :param namespace: the namespace to associate with the current code generation file
         """
         super().__init__(base_name=base_name)
         self.includes = list()
+        self.namespace = namespace
 
     def add_include_file(self, file: str, system: bool = False) -> None:
         """
@@ -217,6 +216,13 @@ class CodegenFileCpp(CodegenFile):
         :return: the filename to write the file to
         """
         raise NotImplementedError()
+
+    def has_namespace(self) -> bool:
+        """
+        Determines if a namespace is associated with the current generator
+        :return: True if a namespace is provided
+        """
+        return len(self.namespace) > 0
 
     def _print_init(self) -> None:
         """
@@ -256,13 +262,14 @@ class CodegenFileCppHeader(CodegenFileCpp):
     Class instance for a Codegen header file for the C++ language
     """
 
-    def __init__(self, base_name: str):
+    def __init__(self, base_name: str, namespace: str = ''):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
+        :param namespace: the namespace to associate with the current code generation file
         """
-        super().__init__(base_name=base_name)
+        super().__init__(base_name=base_name, namespace=namespace)
 
     def _header_guard(self) -> str:
         """
@@ -286,23 +293,26 @@ class CodegenFileCppHeader(CodegenFileCpp):
         self.lines.extend([
             '#ifndef {:s}'.format(self._header_guard()),
             '#define {:s}'.format(self._header_guard()),
-            '',
-            'namespace {:s}'.format(self.NAMESPACE_NAME),
-            '{',
-            ''
-            ])
+            ''])
+
+        if self.has_namespace():
+            self.lines.extend([
+                'namespace {:s}'.format(self.namespace),
+                '{',
+                ''])
 
     def _print_end(self) -> None:
         """
         Adds additional parameters to the write buffer for ending parameter values
         """
+        if self.has_namespace():
+            self.lines.extend(['', '}'])
+
         self.lines.extend([
             '',
-            '}',
-            '',
             '#endif // {:s}'.format(self._header_guard()),
-            ''
-        ])
+            ''])
+
         super()._print_end()
 
 
@@ -311,13 +321,14 @@ class CodegenFileCppSource(CodegenFileCpp):
     Class instance for a Codegen source file for the C++ language
     """
 
-    def __init__(self, base_name: str):
+    def __init__(self, base_name: str, namespace: str = ''):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
+        :param namespace: the namespace to associate with the current code generation file
         """
-        super().__init__(base_name=base_name)
+        super().__init__(base_name=base_name, namespace=namespace)
 
     def _gen_file_name(self) -> str:
         """
@@ -331,5 +342,6 @@ class CodegenFileCppSource(CodegenFileCpp):
         Adds additional parameters to the write buffer for the header guard and the namespace name
         """
         super()._print_init()
-        self.lines.append('using namespace {:s};'.format(self.NAMESPACE_NAME))
-        self.lines.append('')
+        if self.has_namespace():
+            self.lines.append('using namespace {:s};'.format(self.namespace))
+            self.lines.append('')

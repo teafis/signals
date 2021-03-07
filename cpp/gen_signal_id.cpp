@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 05:11:00 UTC
+// Creation Date: 2021-03-07 16:25:45 UTC
 
 #include "gen_signal_id.h"
 
@@ -125,6 +125,99 @@ bool efis_signals::get_signal_id_for_name(const std::string& name, SignalID& sig
     else if (name == "oil_temperature")
     {
         signal = SIGNAL_ID_OIL_TEMPERATURE;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool efis_signals::get_name_for_signal_id(const SignalID& signal_id, std::string name)
+{
+    if (signal_id == SIGNAL_ID_NULL)
+    {
+        name = "null";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_GPS_LATITUDE)
+    {
+        name = "gps_latitude";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_GPS_LONGITUDE)
+    {
+        name = "gps_longitude";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ALTITUDE_MSL)
+    {
+        name = "altitude_msl";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ALTITUDE_AGL)
+    {
+        name = "altitude_agl";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ALTITUDE_RATE)
+    {
+        name = "altitude_rate";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_HEADING_TRUE)
+    {
+        name = "heading_true";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_HEADING_MAG)
+    {
+        name = "heading_mag";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_GROUND_TRACK)
+    {
+        name = "ground_track";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_MAGNETIC_VARIATION)
+    {
+        name = "magnetic_variation";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ATT_PITCH)
+    {
+        name = "att_pitch";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ATT_ROLL)
+    {
+        name = "att_roll";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_SPEED_IAS)
+    {
+        name = "speed_ias";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_SPEED_GS)
+    {
+        name = "speed_gs";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_ENGINE_RPM)
+    {
+        name = "engine_rpm";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_OIL_PRESSURE)
+    {
+        name = "oil_pressure";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_OIL_TEMPERATURE)
+    {
+        name = "oil_temperature";
         return true;
     }
     else

@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 05:11:00 UTC
+// Creation Date: 2021-03-07 16:25:45 UTC
 
 #include "signal_id.h"
 #include <string>
@@ -46,6 +46,8 @@ extern const SignalID SIGNAL_ID_OIL_PRESSURE;
 extern const SignalID SIGNAL_ID_OIL_TEMPERATURE;
 
 bool get_signal_id_for_name(const std::string& name, SignalID& signal);
+
+bool get_name_for_signal_id(const SignalID& signal_id, std::string name);
 
 }
 
