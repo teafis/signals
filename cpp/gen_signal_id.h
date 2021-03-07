@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 17:08:58 UTC
+// Creation Date: 2021-03-07 17:22:04 UTC
 
 #include "signal_id.h"
 #include <string>
@@ -27,22 +27,94 @@
 namespace efis_signals
 {
 
+/**
+ * @brief SIGNAL_ID_NULL is the signal for the empty signal for temporary use
+ */
 extern const SignalID SIGNAL_ID_NULL;
+
+/**
+ * @brief SIGNAL_ID_GPS_LATITUDE is the signal for the GPS latitude of the aircraft
+ */
 extern const SignalID SIGNAL_ID_GPS_LATITUDE;
+
+/**
+ * @brief SIGNAL_ID_GPS_LONGITUDE is the signal for the GPS longitude of the aircraft
+ */
 extern const SignalID SIGNAL_ID_GPS_LONGITUDE;
+
+/**
+ * @brief SIGNAL_ID_ALTITUDE_MSL is the signal for the MSL altitude of the aircraft
+ */
 extern const SignalID SIGNAL_ID_ALTITUDE_MSL;
+
+/**
+ * @brief SIGNAL_ID_ALTITUDE_AGL is the signal for the AGL altitude of the aircraft
+ */
 extern const SignalID SIGNAL_ID_ALTITUDE_AGL;
+
+/**
+ * @brief SIGNAL_ID_ALTITUDE_RATE is the signal for the altitude rate of the aircraft
+ */
 extern const SignalID SIGNAL_ID_ALTITUDE_RATE;
+
+/**
+ * @brief SIGNAL_ID_VERTICAL_SPEED is the signal for the vertical speed of the aircraft
+ */
+extern const SignalID SIGNAL_ID_VERTICAL_SPEED;
+
+/**
+ * @brief SIGNAL_ID_HEADING_TRUE is the signal for the true heading of the aircraft
+ */
 extern const SignalID SIGNAL_ID_HEADING_TRUE;
+
+/**
+ * @brief SIGNAL_ID_HEADING_MAG is the signal for the magnetic heading of the aircraft
+ */
 extern const SignalID SIGNAL_ID_HEADING_MAG;
+
+/**
+ * @brief SIGNAL_ID_GROUND_TRACK is the signal for the ground track of the aircraft
+ */
 extern const SignalID SIGNAL_ID_GROUND_TRACK;
+
+/**
+ * @brief SIGNAL_ID_MAGNETIC_VARIATION is the signal for the current magnetic variation
+ */
 extern const SignalID SIGNAL_ID_MAGNETIC_VARIATION;
+
+/**
+ * @brief SIGNAL_ID_ATT_PITCH is the signal for the pitch attitude angle of the aircraft
+ */
 extern const SignalID SIGNAL_ID_ATT_PITCH;
+
+/**
+ * @brief SIGNAL_ID_ATT_ROLL is the signal for the roll attitude angle of the aircraft
+ */
 extern const SignalID SIGNAL_ID_ATT_ROLL;
+
+/**
+ * @brief SIGNAL_ID_SPEED_IAS is the signal for the indicated airspeed of the aircraft
+ */
 extern const SignalID SIGNAL_ID_SPEED_IAS;
+
+/**
+ * @brief SIGNAL_ID_SPEED_GS is the signal for the ground speed of the aircraft
+ */
 extern const SignalID SIGNAL_ID_SPEED_GS;
+
+/**
+ * @brief SIGNAL_ID_ENGINE_RPM is the signal for the RPM of the engine
+ */
 extern const SignalID SIGNAL_ID_ENGINE_RPM;
+
+/**
+ * @brief SIGNAL_ID_OIL_PRESSURE is the signal for the oil pressure for the engine
+ */
 extern const SignalID SIGNAL_ID_OIL_PRESSURE;
+
+/**
+ * @brief SIGNAL_ID_OIL_TEMPERATURE is the signal for the oil temperature for the engine
+ */
 extern const SignalID SIGNAL_ID_OIL_TEMPERATURE;
 
 /**

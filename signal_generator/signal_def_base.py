@@ -35,16 +35,20 @@ class SignalDefinitionBase:
             cat_id: int,
             sub_id: int,
             name: str,
+            description: str,
             timeout_millisecond: int):
         """
         Creates a signal definition for the provided input parameters
         :param cat_id: the category ID for the signal
         :param sub_id: the signal ID for the signal
+        :param name: the name of the signal
+        :param description: the description for the signal
         :param timeout_millisecond: the number of milliseconds until timeout for the signal
         """
         self.cat_id = cat_id
         self.sub_id = sub_id
         self.name = name
+        self.description = description
         self.timeout_millisecond = timeout_millisecond
 
     @staticmethod
@@ -58,6 +62,7 @@ class SignalDefinitionBase:
             'cat_id': int(sig_def['cat_id']),
             'sub_id': int(sig_def['sub_id']),
             'name': sig_def['name'],
+            'description': sig_def['description'],
             'timeout_millisecond': int(sig_def['timeout'])
         }
 

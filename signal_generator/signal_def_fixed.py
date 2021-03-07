@@ -39,6 +39,7 @@ class SignalDefinitionFixed(SignalDefinitionBase):
             cat_id: int,
             sub_id: int,
             name: str,
+            description: str,
             timeout_millisecond: int,
             units: str,
             resolution: float):
@@ -46,6 +47,8 @@ class SignalDefinitionFixed(SignalDefinitionBase):
         Creates a signal definition for the provided input parameters
         :param cat_id: the category ID for the signal
         :param sub_id: the signal ID for the signal
+        :param name: the name of the signal
+        :param description: the description for the signal
         :param timeout_millisecond: the number of milliseconds until timeout for the signal
         :param units: the unit associated with the signal
         :param resolution: the resolution to multiply network data by to get the engineering data
@@ -54,6 +57,7 @@ class SignalDefinitionFixed(SignalDefinitionBase):
             cat_id=cat_id,
             sub_id=sub_id,
             name=name,
+            description=description,
             timeout_millisecond=timeout_millisecond)
         self.units = units
         self.resolution = resolution

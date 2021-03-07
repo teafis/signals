@@ -121,6 +121,11 @@ def _generate_signal_id_hdr() -> CodegenFileCppHeader:
     # Define the generated SignalID header class instance
     def signal_id_extern_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
         return [
+            '/**',
+            ' * @brief {0:s} is the signal for the {1:s}'.format(
+                _signal_id_name(signal=signal),
+                signal.description),
+            ' */',
             'extern const SignalID {0:s};'.format(_signal_id_name(signal=signal))]
 
     # Define the signal ID printer

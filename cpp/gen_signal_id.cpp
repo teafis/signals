@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 17:08:58 UTC
+// Creation Date: 2021-03-07 17:22:04 UTC
 
 #include "gen_signal_id.h"
 
@@ -28,6 +28,7 @@ const SignalID efis_signals::SIGNAL_ID_GPS_LONGITUDE(10, 11);
 const SignalID efis_signals::SIGNAL_ID_ALTITUDE_MSL(10, 20);
 const SignalID efis_signals::SIGNAL_ID_ALTITUDE_AGL(10, 21);
 const SignalID efis_signals::SIGNAL_ID_ALTITUDE_RATE(10, 22);
+const SignalID efis_signals::SIGNAL_ID_VERTICAL_SPEED(10, 23);
 const SignalID efis_signals::SIGNAL_ID_HEADING_TRUE(10, 30);
 const SignalID efis_signals::SIGNAL_ID_HEADING_MAG(10, 31);
 const SignalID efis_signals::SIGNAL_ID_GROUND_TRACK(10, 32);
@@ -70,6 +71,11 @@ bool efis_signals::get_signal_id_for_name(const std::string& name, SignalID& sig
     else if (name == "altitude_rate")
     {
         signal = SIGNAL_ID_ALTITUDE_RATE;
+        return true;
+    }
+    else if (name == "vertical_speed")
+    {
+        signal = SIGNAL_ID_VERTICAL_SPEED;
         return true;
     }
     else if (name == "heading_true")
@@ -163,6 +169,11 @@ bool efis_signals::get_signal_name_for_id(const SignalID& signal_id, std::string
     else if (signal_id == SIGNAL_ID_ALTITUDE_RATE)
     {
         name = "altitude_rate";
+        return true;
+    }
+    else if (signal_id == SIGNAL_ID_VERTICAL_SPEED)
+    {
+        name = "vertical_speed";
         return true;
     }
     else if (signal_id == SIGNAL_ID_HEADING_TRUE)

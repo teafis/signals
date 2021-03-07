@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-07 16:25:45 UTC
+// Creation Date: 2021-03-07 17:22:04 UTC
 
 #include "signal_database.h"
 #include "signal_type_base.h"
@@ -44,6 +44,9 @@ void SignalDatabase::init_signals()
 
     static SignalTypeFixed signal_altitude_rate(SIGNAL_ID_ALTITUDE_RATE, 1.000000000000000020816682e-02);
     signal_array[SIGNAL_ID_ALTITUDE_RATE.signal_index()] = dynamic_cast<SignalTypeBase*>(&signal_altitude_rate);
+
+    static SignalTypeFixed signal_vertical_speed(SIGNAL_ID_VERTICAL_SPEED, 1.000000000000000020816682e-02);
+    signal_array[SIGNAL_ID_VERTICAL_SPEED.signal_index()] = dynamic_cast<SignalTypeBase*>(&signal_vertical_speed);
 
     static SignalTypeFixed signal_heading_true(SIGNAL_ID_HEADING_TRUE, 8.381903171539306640625000e-08);
     signal_array[SIGNAL_ID_HEADING_TRUE.signal_index()] = dynamic_cast<SignalTypeBase*>(&signal_heading_true);
