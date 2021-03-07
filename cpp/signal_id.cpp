@@ -21,7 +21,7 @@ using namespace efis_signals;
 
 SignalID::SignalID() :
     category_id(0),
-    signal_id(0)
+    sub_id(0)
 {
     // Empty constructor
 }
@@ -30,7 +30,7 @@ SignalID::SignalID(
         const uint8_t category_id,
         const uint8_t signal_id) :
     category_id(category_id),
-    signal_id(signal_id)
+    sub_id(signal_id)
 {
     // Empty Constructor
 }
@@ -39,10 +39,10 @@ bool SignalID::operator==(const SignalID& other) const
 {
     return
             category_id == other.category_id &&
-            signal_id == other.signal_id;
+            sub_id == other.sub_id;
 }
 
 size_t SignalID::signal_index() const
 {
-    return (static_cast<size_t>(category_id) << 8) | signal_id;
+    return (static_cast<size_t>(category_id) << 8) | sub_id;
 }

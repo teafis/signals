@@ -53,7 +53,7 @@ struct SignalID
     /**
      * @brief sub_id the signal sub-category ID
      */
-    uint8_t signal_id;
+    uint8_t sub_id;
 
     /**
      * @brief operator == defines an equality check between two SignalID objects

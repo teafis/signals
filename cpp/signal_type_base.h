@@ -32,7 +32,7 @@ public:
         from_device(0),
         priority(0),
         category_id(signal.category_id),
-        signal_id(signal.signal_id),
+        signal_id(signal.sub_id),
         timestamp(0)
     {
 
