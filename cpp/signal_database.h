@@ -20,7 +20,8 @@
 
 #include <cstdint>
 
-#include "signal_base.h"
+#include "signal_type_base.h"
+#include "signal_type_fixed.h"
 #include "signal_id.h"
 
 namespace efis_signals
@@ -32,19 +33,25 @@ private:
     SignalDatabase();
 
 public:
-    SignalDatabase& get_instance();
+    static SignalDatabase& get_instance();
 
     bool get_signal(
             const SignalID& signal_id,
-            BaseSignal** signal) const;
+            SignalTypeBase** signal) const;
+
+    bool get_fixed_signal(
+            const SignalID& signal_id,
+            SignalTypeFixed** signal) const;
 
     size_t size() const;
+
+    bool update_packet(DataReader& reader);
 
 protected:
     void init_signals();
 
 protected:
-    BaseSignal* signal_array[SignalID::MAX_SIGNAL_COUNT];
+    SignalTypeBase* signal_array[SignalID::MAX_SIGNAL_COUNT];
 };
 
 }

@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "categories": {
+    "status": 0,
+    "aircraft": 10,
+    "engine": 20
+  },
+  "devices": {
+    "any": 0,
+    "pfd_0": 10,
+    "mfd_0": 20,
+    "mfd_1": 21,
+    "pc_0": 30,
+    "daq_0": 40
+  },
+  "signals": [
+    {
+      "cat_id": 0,
+      "sub_id": 0,
+      "name": "null",
+      "timeout": 1000,
+      "type": "base"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 10,
+      "name": "gps_latitude",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 11,
+      "name": "gps_longitude",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 20,
+      "name": "altitude_msl",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "ft",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 21,
+      "name": "altitude_agl",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "ft",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 22,
+      "name": "altitude_rate",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "ft/s",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 30,
+      "name": "heading_true",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 31,
+      "name": "heading_mag",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 32,
+      "name": "ground_track",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 33,
+      "name": "magnetic_variation",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 40,
+      "name": "att_pitch",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 41,
+      "name": "att_roll",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "deg",
+      "resolution": "semi2deg"
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 50,
+      "name": "speed_ias",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "kts",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 10,
+      "sub_id": 51,
+      "name": "speed_gs",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "kts",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 20,
+      "sub_id": 10,
+      "name": "engine_rpm",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "rpm",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 20,
+      "sub_id": 20,
+      "name": "oil_pressure",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "psi",
+      "resolution": 0.01
+    },
+    {
+      "cat_id": 20,
+      "sub_id": 21,
+      "name": "oil_temperature",
+      "timeout": 1000,
+      "type": "fixed",
+      "units": "degC",
+      "resolution": 0.01
+    }
+  ]
+}

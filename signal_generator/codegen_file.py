@@ -23,10 +23,57 @@ between code generation files
 import pathlib
 import typing
 
-from .signal_definition import SignalDefinition
+from .signal_def_base import SignalDefinitionBase
 from .signal_list import SignalList
 
-SignalPrinterCallable = typing.Callable[[SignalDefinition], typing.List[str]]
+SignalPrinterCallable = typing.Callable[[int, SignalDefinitionBase], typing.List[str]]
+
+
+class CodegenSection:
+    """
+    CodegenSection defines a section of code generation for a particular signal parameter
+    """
+
+    def __init__(self, signal_printer: SignalPrinterCallable, indent: int = 0, add_printer_item_separation: bool = True):
+        self.indent = max(indent, 0)
+        self.signal_printer = signal_printer
+        self.item_separation = add_printer_item_separation
+
+        self.init_list = list()
+        self.end_list = list()
+
+        self.init_indent_list = list()
+        self.end_indent_list = list()
+
+    def generate_for_signal_list(self, signal_list: SignalList) -> typing.List[str]:
+        total_list = list()
+        total_list.extend(self.init_list)
+
+        def update_for_indent(input_list: typing.List[str]) -> typing.List[str]:
+            if self.indent > 0:
+                indent_str = '    ' * self.indent
+                return ['{:s}{:s}'.format(indent_str, s) for s in input_list]
+            else:
+                return input_list
+
+        total_list.extend(update_for_indent(self.init_indent_list))
+
+        for i, signal in enumerate(signal_list.definitions.values()):
+            # Determine the text to write for the signal
+            signal_lines = update_for_indent(self.signal_printer(i, signal))
+
+            # Add spacing if the number of signal lines is sufficient
+            if i > 0 and len(signal_lines) > 1 and self.item_separation:
+                total_list.append('')
+
+            # Write the signal lines
+            total_list.extend(signal_lines)
+
+        total_list.extend(update_for_indent(self.end_indent_list))
+
+        total_list.extend(self.end_list)
+
+        return total_list
 
 
 class CodegenFile:
@@ -34,27 +81,25 @@ class CodegenFile:
     CodegenFile defines the base code generation instance file and basic interface
     """
 
-    def __init__(
-            self,
-            base_name: str,
-            signal_printer: SignalPrinterCallable):
+    def __init__(self, base_name: str):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param signal_printer: the function to call to determine what to write for each signal file
         """
         # Save variables and initialize the list
         self.lines = list()
-        self.signal_printer = signal_printer
         self.base_name = base_name
 
-        # Define an empty "extra" function to include in source parameters and save
-        def print_empty() -> typing.List[str]:
-            return list()
+        # Define sections
+        self.sections: typing.List['CodegenSection'] = list()
 
-        self.print_init_extra: typing.Callable[[], typing.List[str]] = print_empty
-        self.print_end_extra: typing.Callable[[], typing.List[str]] = print_empty
+    def add_section(self, section: 'CodegenSection') -> None:
+        """
+        Adds a code generation section to parameters to be output
+        :param section: the section to add
+        """
+        self.sections.append(section)
 
     def _gen_base_name(self) -> str:
         """
@@ -114,22 +159,20 @@ class CodegenFile:
 
         # Write initial text to the file
         self._print_init()
-        self.lines.extend(self.print_init_extra())
 
         # Loop through each signal to add to the list
-        for i, s in enumerate(signal_list.definitions.values()):
-            # Determine the text to write for the signal
-            signal_lines = self.signal_printer(s)
-
-            # Add spacing if the number of signal lines is sufficient
-            if i > 0 and len(signal_lines) > 1:
+        for i, sec in enumerate(self.sections):
+            # Add an empty line if needed
+            if i > 0:
                 self.lines.append('')
 
-            # Write the signal lines
-            self.lines.extend(signal_lines)
+            # Determine the string list for the section
+            section_lines = sec.generate_for_signal_list(signal_list=signal_list)
+
+            # Add the section lines to the list
+            self.lines.extend(section_lines)
 
         # Write final text to the output buffer
-        self.lines.extend(self.print_end_extra())
         self._print_end()
 
         # Strip any ending whitespace
@@ -148,27 +191,25 @@ class CodegenFileCpp(CodegenFile):
     # Define the default namespace name for C++
     NAMESPACE_NAME = 'efis_signals'
 
-    def __init__(
-            self,
-            base_name: str,
-            signal_printer: SignalPrinterCallable):
+    def __init__(self, base_name: str):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param signal_printer: the function to call to determine what to write for each signal file
         """
-        super().__init__(
-            base_name=base_name,
-            signal_printer=signal_printer)
+        super().__init__(base_name=base_name)
         self.includes = list()
 
-    def add_include_file(self, file: str) -> None:
+    def add_include_file(self, file: str, system: bool = False) -> None:
         """
         Adds a file to the list of preprocessor includes to use
         :param file: the file to include
+        :param system: determines if the file is a system file
         """
-        self.includes.append(file)
+        if not system:
+            self.includes.append('#include "{:s}"'.format(file))
+        else:
+            self.includes.append('#include <{:s}>'.format(file))
 
     def _gen_file_name(self) -> str:
         """
@@ -206,7 +247,7 @@ class CodegenFileCpp(CodegenFile):
             ''
             ])
         if len(self.includes) > 0:
-            self.lines.extend(['#include "{:s}"'.format(f) for f in self.includes])
+            self.lines.extend(self.includes)
             self.lines.append('')
 
 
@@ -215,19 +256,13 @@ class CodegenFileCppHeader(CodegenFileCpp):
     Class instance for a Codegen header file for the C++ language
     """
 
-    def __init__(
-            self,
-            base_name: str,
-            signal_printer: SignalPrinterCallable):
+    def __init__(self, base_name: str):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param signal_printer: the function to call to determine what to write for each signal file
         """
-        super().__init__(
-            base_name=base_name,
-            signal_printer=signal_printer)
+        super().__init__(base_name=base_name)
 
     def _header_guard(self) -> str:
         """
@@ -276,19 +311,13 @@ class CodegenFileCppSource(CodegenFileCpp):
     Class instance for a Codegen source file for the C++ language
     """
 
-    def __init__(
-            self,
-            base_name: str,
-            signal_printer: SignalPrinterCallable):
+    def __init__(self, base_name: str):
         """
         Initializes the instance with a base name that will be used to generate parameter items and a signal printer
         function to be called for each signal in the list
         :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param signal_printer: the function to call to determine what to write for each signal file
         """
-        super().__init__(
-            base_name=base_name,
-            signal_printer=signal_printer)
+        super().__init__(base_name=base_name)
 
     def _gen_file_name(self) -> str:
         """

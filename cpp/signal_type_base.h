@@ -15,8 +15,8 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef SIGNAL_BASE_H
-#define SIGNAL_BASE_H
+#ifndef SIGNAL_TYPE_BASE_H
+#define SIGNAL_TYPE_BASE_H
 
 #include "data_common.h"
 
@@ -25,10 +25,10 @@
 namespace efis_signals
 {
 
-class BaseSignal
+class SignalTypeBase
 {
 public:
-    BaseSignal(const SignalID& signal) :
+    SignalTypeBase(const SignalID& signal) :
         from_device(0),
         priority(0),
         category_id(signal.category_id),
@@ -50,55 +50,44 @@ public:
 
     virtual bool deserialize(DataReader& reader)
     {
-        // Create a temporary variables to use in determining deserialization
-        // parameters and ability
-        uint8_t pkt_from_device;
-        uint8_t pkt_priority;
-        uint8_t pkt_category_id;
-        uint8_t pkt_signal_id;
-        uint32_t pkt_timestamp;
-
         // Determine if each of the parameters could be read successfully
         const bool success =
-                reader.read_ubyte(pkt_from_device) &&
-                reader.read_ubyte(pkt_priority) &&
-                reader.read_ubyte(pkt_category_id) &&
-                reader.read_ubyte(pkt_signal_id) &&
-                reader.read_uint(pkt_timestamp);
+                reader.read_ubyte(from_device) &&
+                reader.read_ubyte(priority) &&
+                reader.read_ubyte(category_id) &&
+                reader.read_ubyte(signal_id) &&
+                reader.read_uint(timestamp);
 
-        // Fail if parameters did not read correctly
-        if (!success)
-        {
-            return false;
-        }
-        // Fail if either the category or signal ID do not match the expected
-        else if (pkt_category_id != category_id || pkt_signal_id != signal_id)
-        {
-            return false;
-        }
-        // If we are timed out, then we can update the parameters to accept a new packet
-        else if (timed_out())
-        {
-            from_device = pkt_from_device;
-            priority = pkt_priority;
-            timestamp = pkt_timestamp;
-            return true;
-        }
-        // Check if the priority is greater than the current priority
-        else if (pkt_priority > priority)
-        {
-            return true;
-        }
-        // If the packet originates from the same device, check the timestamps
-        else if (pkt_from_device == from_device)
-        {
-            return pkt_timestamp >= timestamp;
-        }
-        // Otherwise return false;
-        else
-        {
-            return false;
-        }
+        // TODO: Update timestamp here
+        return success;
+    }
+
+    bool read_base(DataReader& reader)
+    {
+        return
+                reader.read_ubyte(from_device) &&
+                reader.read_ubyte(priority) &&
+                reader.read_ubyte(category_id) &&
+                reader.read_ubyte(signal_id) &&
+                reader.read_uint(timestamp);
+    }
+
+    bool can_update_base(const SignalTypeBase& other) const
+    {
+        return
+                category_id == other.category_id &&
+                signal_id == other.signal_id &&
+                (
+                    timed_out() ||
+                    other.priority > priority ||
+                    (other.from_device == from_device && other.timestamp > timestamp));
+    }
+
+    SignalID get_signal_id() const
+    {
+        return SignalID(
+                    category_id,
+                    signal_id);
     }
 
     bool timed_out() const
@@ -106,7 +95,12 @@ public:
         return false;
     }
 
-    virtual size_t packet_size() const
+    bool is_valid() const
+    {
+        return false;
+    }
+
+    virtual size_t size() const
     {
         return 8;
     }
@@ -121,4 +115,4 @@ protected:
 
 }
 
-#endif // SIGNAL_BASE_H
+#endif // SIGNAL_TYPE_BASE_H

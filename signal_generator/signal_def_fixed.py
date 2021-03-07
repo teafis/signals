@@ -19,38 +19,60 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 SignalFixed defines the fixed-resolution signal definition
 """
 
-from .signal_definition import SignalDefinition
+import typing
+
+from .signal_def_base import SignalDefinitionBase
 
 
-class SignalFixedDefinition(SignalDefinition):
+class SignalDefinitionFixed(SignalDefinitionBase):
     """
     Class to maintain the definition for an analog signal type
     """
+
+    # Define the resolution map
+    RESOLUTION_MAP = {
+        'semi2deg': 180.0 / 2**31
+    }
 
     def __init__(
             self,
             cat_id: int,
             sub_id: int,
             name: str,
-            unit: str,
-            sig_type: str,
             timeout_millisecond: int,
+            units: str,
             resolution: float):
         """
         Creates a signal definition for the provided input parameters
         :param cat_id: the category ID for the signal
         :param sub_id: the signal ID for the signal
-        :param unit: the unit associated with the signal
-        :param sig_type: the signal type
         :param timeout_millisecond: the number of milliseconds until timeout for the signal
+        :param units: the unit associated with the signal
         :param resolution: the resolution to multiply network data by to get the engineering data
         """
-        super().__init__(cat_id, sub_id, name, unit, sig_type, timeout_millisecond)
+        super().__init__(
+            cat_id=cat_id,
+            sub_id=sub_id,
+            name=name,
+            timeout_millisecond=timeout_millisecond)
+        self.units = units
         self.resolution = resolution
 
-    def generate_cpp_code(self) -> str:
+    @staticmethod
+    def from_json_def(sig_def: typing.Dict[str, typing.Union[str, float, int]]) -> 'SignalDefinitionBase':
         """
-        Generates C++ Code for the given packet type
-        :return: C++ code for the current signal type
+        Provides a signal definition from a single comma-separated line of the signal list, in the form
+          CategoryID,SubID,Name,Units,Type,TimeoutMillisecond
+        :param sig_def: the JSON dictionary definition for the signal
+        :return: the signal definition for the values found in the line
         """
-        raise NotImplementedError()
+        resolution = sig_def['resolution']
+        if isinstance(resolution, str):
+            resolution = SignalDefinitionFixed.RESOLUTION_MAP[resolution]
+        else:
+            resolution = float(resolution)
+
+        return SignalDefinitionFixed(
+            units=sig_def['units'],
+            resolution=resolution,
+            **SignalDefinitionFixed._get_base_args(sig_def=sig_def))

@@ -15,10 +15,10 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef SIGNAL_FIXED_H
-#define SIGNAL_FIXED_H
+#ifndef SIGNAL_TYPE_FIXED_H
+#define SIGNAL_TYPE_FIXED_H
 
-#include "signal_base.h"
+#include "signal_type_base.h"
 
 #include <cstdint>
 #include <limits>
@@ -26,11 +26,11 @@
 namespace efis_signals
 {
 
-class SignalFixed : public BaseSignal
+class SignalTypeFixed : public SignalTypeBase
 {
 public:
-    SignalFixed(const SignalID& signal, const double resolution) :
-        BaseSignal(signal),
+    SignalTypeFixed(const SignalID& signal, const double resolution) :
+        SignalTypeBase(signal),
         resolution(resolution),
         value(0.0)
     {
@@ -71,7 +71,7 @@ public:
     virtual bool serialize(DataWriter& writer) const override
     {
         return
-                BaseSignal::serialize(writer) &&
+                SignalTypeBase::serialize(writer) &&
                 writer.add_uint(get_data_value());
     }
 
@@ -79,7 +79,7 @@ public:
     {
         uint32_t raw_value = 0;
         const bool success =
-                BaseSignal::deserialize(reader) &&
+                SignalTypeBase::deserialize(reader) &&
                 reader.read_uint(raw_value);
 
         if (success)
@@ -93,9 +93,9 @@ public:
         }
     }
 
-    virtual size_t packet_size() const override
+    virtual size_t size() const override
     {
-        return BaseSignal::packet_size() + 4;
+        return SignalTypeBase::size() + 4;
     }
 
 protected:
@@ -116,4 +116,4 @@ protected:
 
 }
 
-#endif // SIGNAL_FIXED_H
+#endif // SIGNAL_TYPE_FIXED_H

@@ -40,9 +40,40 @@ size_t SignalDatabase::size() const
     return SignalID::MAX_SIGNAL_COUNT;
 }
 
+bool SignalDatabase::update_packet(DataReader& reader)
+{
+    SignalTypeBase read_signal(SignalID(0, 0));
+    if (reader.bytes_available() >= read_signal.size() && read_signal.deserialize(reader))
+    {
+        reader.reset();
+        SignalTypeBase* signal_to_update = nullptr;
+
+        if (!get_signal(read_signal.get_signal_id(), &signal_to_update))
+        {
+            return false;
+        }
+        else if (reader.bytes_available() < signal_to_update->size())
+        {
+            return false;
+        }
+        else if (!signal_to_update->can_update_base(read_signal))
+        {
+            return false;
+        }
+        else
+        {
+            return signal_to_update->deserialize(reader);
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool SignalDatabase::get_signal(
         const SignalID& signal_id,
-        BaseSignal** signal) const
+        SignalTypeBase** signal) const
 {
     const size_t signal_index = signal_id.signal_index();
     if (signal_index < size() && signal_array[signal_index] != nullptr)
@@ -54,4 +85,20 @@ bool SignalDatabase::get_signal(
     {
         return false;
     }
+}
+
+bool SignalDatabase::get_fixed_signal(
+        const SignalID& signal_id,
+        SignalTypeFixed** signal) const
+{
+    // Obtain the base signal
+    SignalTypeBase* base;
+    if (!get_signal(signal_id, &base))
+    {
+        return false;
+    }
+
+    // Attempt to convert to a fixed type
+    *signal = dynamic_cast<SignalTypeFixed*>(base);
+    return *signal != nullptr;
 }

@@ -19,6 +19,13 @@
 
 using namespace efis_signals;
 
+SignalID::SignalID() :
+    category_id(0),
+    signal_id(0)
+{
+    // Empty constructor
+}
+
 SignalID::SignalID(
         const uint8_t category_id,
         const uint8_t signal_id) :

@@ -20,8 +20,12 @@ SignalDefinition provides the overall signal definition parameters for a generic
 signal type within the TeaFIS project
 """
 
+import typing
 
-class SignalDefinition:
+JSON_DICT_TYPE = typing.Dict[str, typing.Union[str, float, int]]
+
+
+class SignalDefinitionBase:
     """
     Class to maintain the definition for a signal type
     """
@@ -31,69 +35,38 @@ class SignalDefinition:
             cat_id: int,
             sub_id: int,
             name: str,
-            unit: str,
-            sig_type: str,
             timeout_millisecond: int):
         """
         Creates a signal definition for the provided input parameters
         :param cat_id: the category ID for the signal
         :param sub_id: the signal ID for the signal
-        :param unit: the unit associated with the signal
-        :param sig_type: the signal type
         :param timeout_millisecond: the number of milliseconds until timeout for the signal
         """
         self.cat_id = cat_id
         self.sub_id = sub_id
         self.name = name
-        self.unit = unit
-        self.sig_type = sig_type
         self.timeout_millisecond = timeout_millisecond
 
-    def generate_cpp_code(self) -> str:
+    @staticmethod
+    def _get_base_args(sig_def: JSON_DICT_TYPE) -> JSON_DICT_TYPE:
         """
-        Generates C++ Code for the given packet type
-        :return: C++ code for the current signal type
+        Parses and returns a dictionary of the base arguments for a signal
+        :param sig_def: the JSON dictionary definition for the signal
+        :return: common input arguments for the dictionary signal
         """
-        raise NotImplementedError()
+        return {
+            'cat_id': int(sig_def['cat_id']),
+            'sub_id': int(sig_def['sub_id']),
+            'name': sig_def['name'],
+            'timeout_millisecond': int(sig_def['timeout'])
+        }
 
     @staticmethod
-    def from_csv_line(line: str) -> 'SignalDefinition':
+    def from_json_def(sig_def: JSON_DICT_TYPE) -> 'SignalDefinitionBase':
         """
         Provides a signal definition from a single comma-separated line of the signal list, in the form
           CategoryID,SubID,Name,Units,Type,TimeoutMillisecond
-        :param line: the line to extract the signal definition from
+        :param sig_def: the JSON dictionary definition for the signal
         :return: the signal definition for the values found in the line
         """
-        # Split the input line by commas
-        words = [word.strip() for word in line.split(',')]
-
-        # Ensure that there is the expected number of parameters
-        if len(words) != 7:
-            raise ValueError('Invalid number of parameters found in the line, expecting 6, got {:d}'.format(len(words)))
-
-        # Extract the signal parameters
-        cat_id = int(words[0])
-        sub_id = int(words[1])
-        name = words[2]
-        unit = words[3]
-        sig_type = words[4]
-        timeout_millisecond = int(words[5])
-
-        if words[6] == 'semi2deg':
-            resolution = 180.0 / 2**31
-        else:
-            resolution = float(words[6])
-
-        # Return the signal type based on the provided definition
-        if sig_type == 'fixed':
-            from .signal_type_fixed import SignalFixedDefinition
-            return SignalFixedDefinition(
-                cat_id=cat_id,
-                sub_id=sub_id,
-                name=name,
-                unit=unit,
-                sig_type=sig_type,
-                timeout_millisecond=timeout_millisecond,
-                resolution=resolution)
-        else:
-            raise RuntimeError('Signal type {:s} is not yet supported'.format(sig_type))
+        return SignalDefinitionBase(**SignalDefinitionBase._get_base_args(sig_def=sig_def))

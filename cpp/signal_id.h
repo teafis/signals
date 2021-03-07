@@ -32,6 +32,11 @@ namespace efis_signals
 struct SignalID
 {
     /**
+     * @brief SignalID constructs a null signal ID instance
+     */
+    SignalID();
+
+    /**
      * @brief SignalID constructs a signal ID instance
      * @param category_id is the category ID for the associated signal
      * @param signal_id is the signal ID for the associated signal
