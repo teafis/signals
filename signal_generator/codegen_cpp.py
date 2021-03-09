@@ -37,6 +37,14 @@ def _get_namespace_name() -> str:
     return 'efis_signals'
 
 
+def _get_signal_version_name() -> str:
+    """
+    Defines the variable name to use for the signal version variable name
+    :return: the signal version variable name
+    """
+    return 'SIGNAL_VERSION_NUM'
+
+
 def _signal_def_name(signal: SignalDefinitionBase) -> str:
     """
     Provides a signal ID variable name
@@ -53,15 +61,6 @@ def _signal_var_name(signal: SignalDefinitionBase) -> str:
     :return: the associated variable name
     """
     return 'signal_{:s}'.format(signal.name.lower())
-
-
-def _empty_printer(*_) -> typing.List[str]:
-    """
-    Provides a printer to perform no additions for each signal parameter
-    :param _: variable argument input to be ignored
-    :return: an empty list
-    """
-    return list()
 
 
 def _get_find_id_func_name() -> str:
@@ -119,7 +118,7 @@ def _generate_signal_def_hdr() -> CodegenFileCppHeader:
     :return: the associated C++ header code generator
     """
     # Define the generated Signal Definition header class instance
-    def signal_def_extern_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
+    def signal_def_extern_printer(_, __, signal: SignalDefinitionBase) -> typing.List[str]:
         return [
             '/**',
             ' * @brief {0:s} is the signal for the {1:s}'.format(
@@ -132,10 +131,17 @@ def _generate_signal_def_hdr() -> CodegenFileCppHeader:
     codegen = CodegenFileCppHeader(
         base_name='signal_def',
         namespace=_get_namespace_name())
+
+    # Add the signal list version value
+    get_def_version_sec = CodegenSection(signal_printer=None)
+    get_def_version_sec.init_list = ['static const uint32_t {:s};'.format(_get_signal_version_name())]
+    codegen.add_section(section=get_def_version_sec)
+
+    # Add the signal definition list printer
     codegen.add_section(section=CodegenSection(signal_printer=signal_def_extern_printer))
 
     # Add the section for the get-id by name function
-    get_by_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
+    get_by_name_sig_sec = CodegenSection(signal_printer=None)
     get_by_name_sig_sec.init_list = [
         '/**',
         ' * @brief {:s} provides the signal definition for the provided name'.format(_get_find_id_func_name()),
@@ -147,7 +153,7 @@ def _generate_signal_def_hdr() -> CodegenFileCppHeader:
     codegen.add_section(section=get_by_name_sig_sec)
 
     # Add the section for the get-name function
-    get_def_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
+    get_def_name_sig_sec = CodegenSection(signal_printer=None)
     get_def_name_sig_sec.init_list = [
         '/**',
         ' * @brief {:s} provides the name of the signal'.format(_get_find_name_func_name()),
@@ -173,7 +179,7 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
     :return: the associated C++ source code generator
     """
     # Define the generated Signal Definition source class instance
-    def signal_def_constructor_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
+    def signal_def_constructor_printer(_, __, signal: SignalDefinitionBase) -> typing.List[str]:
         return [
             'const SignalDef {0:s}::{1:s}({2:d}, {3:d}, {4:d});'.format(
                 _get_namespace_name(),
@@ -187,10 +193,21 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
     codegen = CodegenFileCppSource(
         base_name='signal_def',
         namespace=_get_namespace_name())
+
+    # Add the section for the signal version number
+    # TODO - Add way to get version information here
+    version_num_sec = CodegenSection(signal_printer=None)
+    version_num_sec.init_list = [
+        'const uint32_t {0:s}::{1:s} = 0;'.format(
+            _get_namespace_name(),
+            _get_signal_version_name())]
+    codegen.add_section(section=version_num_sec)
+
+    # Add the constructor section for the different signal definition constructors
     codegen.add_section(section=CodegenSection(signal_printer=signal_def_constructor_printer))
 
     # Define and add the section for the get-id by name function
-    def func_get_id_printer(index: int, signal: SignalDefinitionBase) -> typing.List[str]:
+    def func_get_id_printer(index: int, _, signal: SignalDefinitionBase) -> typing.List[str]:
         if index == 0:
             if_val = 'if'
         else:
@@ -220,7 +237,7 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
     codegen.add_section(func_get_id_sec)
 
     # Define and add the section for the get-name from ID  function
-    def func_get_name_printer(index: int, signal: SignalDefinitionBase) -> typing.List[str]:
+    def func_get_name_printer(index: int, _, signal: SignalDefinitionBase) -> typing.List[str]:
         if index == 0:
             if_val = 'if'
         else:
@@ -263,7 +280,7 @@ def _generate_signal_db_src() -> CodegenFileCppSource:
     :return: the associated C++ source code generator
     """
     # Define the generated Signal Database source class instance
-    def signal_static_func_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
+    def signal_static_func_printer(_, __, signal: SignalDefinitionBase) -> typing.List[str]:
         # Define the return list
         src_list = list()
 

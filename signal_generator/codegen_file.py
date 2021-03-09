@@ -26,7 +26,7 @@ import typing
 from .signal_def_base import SignalDefinitionBase
 from .signal_list import SignalList
 
-SignalPrinterCallable = typing.Callable[[int, SignalDefinitionBase], typing.List[str]]
+SignalPrinterCallable = typing.Callable[[int, SignalList, SignalDefinitionBase], typing.List[str]]
 
 
 class CodegenSection:
@@ -34,33 +34,73 @@ class CodegenSection:
     CodegenSection defines a section of code generation for a particular signal parameter
     """
 
-    def __init__(self, signal_printer: SignalPrinterCallable, indent: int = 0, add_printer_item_separation: bool = True):
+    def __init__(
+            self,
+            signal_printer: typing.Union[SignalPrinterCallable, None],
+            indent: int = 0,
+            add_printer_item_separation: bool = True):
+        """
+        Initializes the codegen section with the provided signal parameters
+        :param signal_printer: is the signal printer to use
+        :param indent: is the number of indentations for the repeated section
+        :param add_printer_item_separation: determines whether to add separation to items
+        in the looped section
+        """
+        # Save parameters
         self.indent = max(indent, 0)
         self.signal_printer = signal_printer
         self.item_separation = add_printer_item_separation
 
+        # Update the signal printer if none
+        if self.signal_printer is None:
+            def _empty_printer(*_, **__) -> typing.List[str]:
+                """
+                Provides a printer to perform no additions for each signal parameter
+                :param _: variable argument input to be ignored
+                :return: an empty list
+                """
+                return list()
+            self.signal_printer = _empty_printer
+
+        # Initialize the init/end list not added to indentations
         self.init_list = list()
         self.end_list = list()
 
+        # Initialize the init/end list added to indentations
         self.init_indent_list = list()
         self.end_indent_list = list()
 
     def generate_for_signal_list(self, signal_list: SignalList) -> typing.List[str]:
+        """
+        Generates the code for the given signal list
+        :param signal_list: the signal list to generate code for
+        :return: a list of lines within the generated code
+        """
+        # Define the initial list and add any initial parameters
         total_list = list()
         total_list.extend(self.init_list)
 
+        # Define the update for indentation function for list parameters
         def update_for_indent(input_list: typing.List[str]) -> typing.List[str]:
+            """
+            Adds an indentation to the level requested for lines if needed
+            :param input_list: the input list to update
+            :return: a list with indentation appended to the front of the list if
+            needed, or the original list if no indentation requested
+            """
             if self.indent > 0:
                 indent_str = '    ' * self.indent
                 return ['{:s}{:s}'.format(indent_str, s) for s in input_list]
             else:
                 return input_list
 
+        # Add the indentation init function
         total_list.extend(update_for_indent(self.init_indent_list))
 
+        # Loop through each signal
         for i, signal in enumerate(signal_list.definitions.values()):
             # Determine the text to write for the signal
-            signal_lines = update_for_indent(self.signal_printer(i, signal))
+            signal_lines = update_for_indent(self.signal_printer(i, signal_list, signal))
 
             # Add spacing if the number of signal lines is sufficient
             if i > 0 and len(signal_lines) > 1 and self.item_separation:
@@ -69,10 +109,11 @@ class CodegenSection:
             # Write the signal lines
             total_list.extend(signal_lines)
 
+        # Add the ending init and ending function
         total_list.extend(update_for_indent(self.end_indent_list))
-
         total_list.extend(self.end_list)
 
+        # Return the results
         return total_list
 
 
