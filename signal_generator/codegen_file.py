@@ -276,7 +276,7 @@ class CodegenFileCppHeader(CodegenFileCpp):
         Provides the name of the header guard for the header file
         :return: the header guard string
         """
-        return '{:s}_H'.format(self._gen_base_name().upper())
+        return 'TF_{:s}_H'.format(self._gen_base_name().upper())
 
     def _gen_file_name(self) -> str:
         """

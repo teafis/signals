@@ -15,11 +15,12 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef EFIS_SIGNALS_COMMON_H
-#define EFIS_SIGNALS_COMMON_H
+#ifndef TF_SIGNALS_COMMON_H
+#define TF_SIGNALS_COMMON_H
 
 #include <cstddef>
 #include <cstdint>
+#include "data_type_scaled.h"
 
 namespace efis_signals
 {
@@ -38,25 +39,32 @@ public:
     DataReader();
 
     /**
-     * @brief read_byte reads a single uint8_t from the current buffer
+     * @brief read_ubyte reads a single uint8_t from the current buffer
      * @param val stores the byte value if read sucessfully
      * @return true if the byte is read
      */
     bool read_ubyte(uint8_t& val);
 
     /**
-     * @brief read_short reads a single uint16_t from the current buffer
+     * @brief read_ushort reads a single uint16_t from the current buffer
      * @param val stores the short if read successfully
      * @return true if the short is successfully read
      */
     bool read_ushort(uint16_t& val);
 
     /**
-     * @brief read_int reads a single uint32_t from the current buffer
+     * @brief read_uint reads a single uint32_t from the current buffer
      * @param val stores the int if read successfully
-     * @return true if the short is successfully read
+     * @return true if the int is successfully read
      */
     bool read_uint(uint32_t& val);
+
+    /**
+     * @brief read_scaled reads a single scaled data from the current buffer
+     * @param val stores the scaled data if read successfully
+     * @return true if the scaled data is successfully read
+     */
+    bool read_scaled(DataTypeScaled& val);
 
     /**
      * @brief bytes_available determines the number of bytes available to read
@@ -108,25 +116,32 @@ public:
     DataWriter();
 
     /**
-     * @brief add_byte adds a byte to the buffer
+     * @brief add_ubyte adds a byte to the buffer
      * @param val is the byte to add
      * @return true if the byte was able to be successfully added
      */
     bool add_ubyte(const uint8_t val);
 
     /**
-     * @brief add_short adds a short to the buffer
+     * @brief add_ushort adds a short to the buffer
      * @param val is the short to add
      * @return true if the short was able to be successfully added
      */
     bool add_ushort(const uint16_t val);
 
     /**
-     * @brief add_short adds an int to the buffer
+     * @brief add_uint adds an int to the buffer
      * @param val is the int to add
      * @return true if the int was able to be successfully added
      */
     bool add_uint(const uint32_t val);
+
+    /**
+     * @brief add_scaled adds a scaled data to the buffer
+     * @param val is the scaled data to add
+     * @return true if the scaled was able to be successfully added
+     */
+    bool add_scaled(const DataTypeScaled& val);
 
     /**
      * @brief reset resets the current buffer pointer index to the start of the buffer
@@ -175,4 +190,4 @@ protected:
 
 }
 
-#endif
+#endif // TF_SIGNALS_COMMON_H

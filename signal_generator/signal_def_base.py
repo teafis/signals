@@ -49,7 +49,7 @@ class SignalDefinitionBase:
         self.sub_id = sub_id
         self.name = name
         self.description = description
-        self.timeout_millisecond = timeout_millisecond
+        self.timeout_milliseconds = timeout_millisecond
 
     @staticmethod
     def _get_base_args(sig_def: JSON_DICT_TYPE) -> JSON_DICT_TYPE:
@@ -58,13 +58,21 @@ class SignalDefinitionBase:
         :param sig_def: the JSON dictionary definition for the signal
         :return: common input arguments for the dictionary signal
         """
-        return {
-            'cat_id': int(sig_def['cat_id']),
-            'sub_id': int(sig_def['sub_id']),
-            'name': sig_def['name'],
-            'description': sig_def['description'],
-            'timeout_millisecond': int(sig_def['timeout'])
-        }
+        name = sig_def['name']
+        desc = sig_def['description']
+
+        if not isinstance(name, str):
+            raise ValueError('name must be provided as a string')
+        elif not isinstance(desc, str):
+            raise ValueError('description must be provided as a string')
+        else:
+            return {
+                'cat_id': int(sig_def['cat_id']),
+                'sub_id': int(sig_def['sub_id']),
+                'name': sig_def['name'],
+                'description': sig_def['description'],
+                'timeout_millisecond': int(sig_def['timeout'])
+            }
 
     @staticmethod
     def from_json_def(sig_def: JSON_DICT_TYPE) -> 'SignalDefinitionBase':

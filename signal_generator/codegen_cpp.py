@@ -26,7 +26,7 @@ import typing
 from .signal_list import SignalList
 from .codegen_file import CodegenFileCppHeader, CodegenFileCppSource, CodegenSection
 from .signal_def_base import SignalDefinitionBase
-from .signal_def_fixed import SignalDefinitionFixed
+from .signal_def_scaled import SignalDefinitionScaled
 
 
 def _get_namespace_name() -> str:
@@ -37,13 +37,13 @@ def _get_namespace_name() -> str:
     return 'efis_signals'
 
 
-def _signal_id_name(signal: SignalDefinitionBase) -> str:
+def _signal_def_name(signal: SignalDefinitionBase) -> str:
     """
     Provides a signal ID variable name
     :param signal: the signal to generate the name for
     :return: the associated variable name
     """
-    return 'SIGNAL_ID_{:s}'.format(signal.name.upper())
+    return 'SIGNAL_DEF_{:s}'.format(signal.name.upper())
 
 
 def _signal_var_name(signal: SignalDefinitionBase) -> str:
@@ -69,7 +69,7 @@ def _get_find_id_func_name() -> str:
         Provides the name of the find by name function
         :return: the name of the get signal name by ID function
         """
-    return 'get_signal_id_for_name'
+    return 'get_signal_def_for_name'
 
 
 def _get_find_func_sig(with_namespace: bool) -> str:
@@ -83,17 +83,17 @@ def _get_find_func_sig(with_namespace: bool) -> str:
     else:
         namespace_sec = ''
 
-    return 'bool {0:s}{1:s}(const std::string& name, SignalID& signal)'.format(
+    return 'bool {0:s}{1:s}(const std::string& name, SignalDef& signal)'.format(
         namespace_sec,
         _get_find_id_func_name())
 
 
 def _get_find_name_func_name() -> str:
     """
-    Provides the name of the find by ID function
-    :return: the name of the get signal name by ID function
+    Provides the name of the find by definition function
+    :return: the name of the get signal name by definition function
     """
-    return 'get_signal_name_for_id'
+    return 'get_signal_name_for_def'
 
 
 def _get_find_name_func_sig(with_namespace: bool) -> str:
@@ -107,86 +107,87 @@ def _get_find_name_func_sig(with_namespace: bool) -> str:
     else:
         namespace_sec = ''
 
-    return 'bool {0:s}{1:s}(const SignalID& signal_id, std::string name)'.format(
+    return 'bool {0:s}{1:s}(const SignalDef& signal_def, std::string name)'.format(
         namespace_sec,
         _get_find_name_func_name())
 
 
-def _generate_signal_id_hdr() -> CodegenFileCppHeader:
+def _generate_signal_def_hdr() -> CodegenFileCppHeader:
     """
-    Provides the code generator required to generate the signal ID header file,
-    for gen_signal_id.h
+    Provides the code generator required to generate the signal Def header file,
+    for gen_signal_def.h
     :return: the associated C++ header code generator
     """
-    # Define the generated SignalID header class instance
-    def signal_id_extern_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
+    # Define the generated Signal Definition header class instance
+    def signal_def_extern_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
         return [
             '/**',
             ' * @brief {0:s} is the signal for the {1:s}'.format(
-                _signal_id_name(signal=signal),
+                _signal_def_name(signal=signal),
                 signal.description),
             ' */',
-            'extern const SignalID {0:s};'.format(_signal_id_name(signal=signal))]
+            'extern const SignalDef {0:s};'.format(_signal_def_name(signal=signal))]
 
     # Define the signal ID printer
     codegen = CodegenFileCppHeader(
-        base_name='signal_id',
+        base_name='signal_def',
         namespace=_get_namespace_name())
-    codegen.add_section(section=CodegenSection(signal_printer=signal_id_extern_printer))
+    codegen.add_section(section=CodegenSection(signal_printer=signal_def_extern_printer))
 
     # Add the section for the get-id by name function
     get_by_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
     get_by_name_sig_sec.init_list = [
         '/**',
-        ' * @brief get_signal_id_for_name provides the signal ID for the provided name',
+        ' * @brief {:s} provides the signal definition for the provided name'.format(_get_find_id_func_name()),
         ' * @param name is the name of the signal to find',
-        ' * @param signal provides the resulting signal ID if found',
+        ' * @param signal provides the resulting signal definition if found',
         ' * @return true if a signal for the given name is found',
         ' */',
         '{:s};'.format(_get_find_func_sig(with_namespace=False))]
     codegen.add_section(section=get_by_name_sig_sec)
 
     # Add the section for the get-name function
-    get_id_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
-    get_id_name_sig_sec.init_list = [
+    get_def_name_sig_sec = CodegenSection(signal_printer=_empty_printer)
+    get_def_name_sig_sec.init_list = [
         '/**',
         ' * @brief {:s} provides the name of the signal'.format(_get_find_name_func_name()),
-        ' * @param signal_id is the signal ID to try to find a name for',
+        ' * @param signal_def is the signal definition to try to find a name for',
         ' * @param name provides the name of the signal if found',
         ' * @return true if a name for the given signal is found',
         ' */',
         '{:s};'.format(_get_find_name_func_sig(with_namespace=False))]
-    codegen.add_section(section=get_id_name_sig_sec)
+    codegen.add_section(section=get_def_name_sig_sec)
 
     # Add include parameters
-    codegen.add_include_file('signal_id.h')
+    codegen.add_include_file('signal_def.h')
     codegen.add_include_file('string', system=True)
 
     # Return the code generator
     return codegen
 
 
-def _generate_signal_id_src() -> CodegenFileCppSource:
+def _generate_signal_def_src() -> CodegenFileCppSource:
     """
     Provides the code generator required to generate the signal ID source file,
-    for gen_signal_id.cpp
+    for gen_signal_def.cpp
     :return: the associated C++ source code generator
     """
-    # Define the generated SignalID source class instance
-    def signal_id_constructor_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
+    # Define the generated Signal Definition source class instance
+    def signal_def_constructor_printer(_, signal: SignalDefinitionBase) -> typing.List[str]:
         return [
-            'const SignalID {0:s}::{1:s}({2:d}, {3:d});'.format(
+            'const SignalDef {0:s}::{1:s}({2:d}, {3:d}, {4:d});'.format(
                 _get_namespace_name(),
-                _signal_id_name(signal=signal),
+                _signal_def_name(signal=signal),
                 signal.cat_id,
-                signal.sub_id)
+                signal.sub_id,
+                signal.timeout_milliseconds)
             ]
 
     # Define the code generator and the associated constructor section
     codegen = CodegenFileCppSource(
-        base_name='signal_id',
+        base_name='signal_def',
         namespace=_get_namespace_name())
-    codegen.add_section(section=CodegenSection(signal_printer=signal_id_constructor_printer))
+    codegen.add_section(section=CodegenSection(signal_printer=signal_def_constructor_printer))
 
     # Define and add the section for the get-id by name function
     def func_get_id_printer(index: int, signal: SignalDefinitionBase) -> typing.List[str]:
@@ -198,7 +199,7 @@ def _generate_signal_id_src() -> CodegenFileCppSource:
         return [
             '{0:s} (name == "{1:s}")'.format(if_val, signal.name),
             '{',
-            '    signal = {0:s};'.format(_signal_id_name(signal)),
+            '    signal = {0:s};'.format(_signal_def_name(signal)),
             '    return true;',
             '}'
         ]
@@ -226,7 +227,7 @@ def _generate_signal_id_src() -> CodegenFileCppSource:
             if_val = 'else if'
 
         return [
-            '{0:s} (signal_id == {1:})'.format(if_val, _signal_id_name(signal)),
+            '{0:s} (signal_def == {1:})'.format(if_val, _signal_def_name(signal)),
             '{',
             '    name = "{0:s}";'.format(signal.name),
             '    return true;',
@@ -249,7 +250,7 @@ def _generate_signal_id_src() -> CodegenFileCppSource:
     codegen.add_section(func_get_name_sec)
 
     # Add include parameters
-    codegen.add_include_file('gen_signal_id.h')
+    codegen.add_include_file('gen_signal_def.h')
 
     # Return the code generator
     return codegen
@@ -267,10 +268,10 @@ def _generate_signal_db_src() -> CodegenFileCppSource:
         src_list = list()
 
         # Define the type of the signal based on the definition type
-        constructor_args = [_signal_id_name(signal=signal)]
+        constructor_args = [_signal_def_name(signal=signal)]
 
-        if isinstance(signal, SignalDefinitionFixed):
-            signal_type = 'SignalTypeFixed'
+        if isinstance(signal, SignalDefinitionScaled):
+            signal_type = 'SignalTypeScaled'
             constructor_args.append('{:.24e}'.format(signal.resolution))
         elif type(signal) == SignalDefinitionBase:
             signal_type = 'SignalTypeBase'
@@ -283,7 +284,7 @@ def _generate_signal_db_src() -> CodegenFileCppSource:
             _signal_var_name(signal=signal),
             ', '.join(constructor_args)))
         src_list.append('signal_array[{0:s}.signal_index()] = dynamic_cast<SignalTypeBase*>(&{1:});'.format(
-            _signal_id_name(signal=signal),
+            _signal_def_name(signal=signal),
             _signal_var_name(signal=signal)))
 
         # Add indentation and return
@@ -309,8 +310,8 @@ def _generate_signal_db_src() -> CodegenFileCppSource:
     # Add required include files
     codegen.add_include_file('signal_database.h')
     codegen.add_include_file('signal_type_base.h')
-    codegen.add_include_file('signal_type_fixed.h')
-    codegen.add_include_file('gen_signal_id.h')
+    codegen.add_include_file('signal_type_scaled.h')
+    codegen.add_include_file('gen_signal_def.h')
 
     # Return the generator
     return codegen
@@ -323,7 +324,7 @@ def generate_cpp_code(signal_list: SignalList, target_dir: pathlib.Path) -> None
     :param target_dir: the target directory to put the generated code in
     """
     # Run the code generation for each individual file
-    for codegen in (_generate_signal_id_hdr(), _generate_signal_id_src(), _generate_signal_db_src()):
+    for codegen in (_generate_signal_def_hdr(), _generate_signal_def_src(), _generate_signal_db_src()):
         codegen.generate_code(
             target_dir=target_dir,
             signal_list=signal_list)

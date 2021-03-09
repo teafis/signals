@@ -15,51 +15,31 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef TF_SIGNAL_DATABASE_H
-#define TF_SIGNAL_DATABASE_H
+#ifndef TF_SIGNAL_CRC16_H
+#define TF_SIGNAL_CRC16_H
 
 #include <cstdint>
-
-#include "signal_type_base.h"
-#include "signal_type_scaled.h"
-#include "signal_def.h"
-
-#include "crc16.h"
 
 namespace efis_signals
 {
 
-class SignalDatabase
+class CRC16
 {
-private:
-    SignalDatabase();
-
 public:
-    static SignalDatabase& get_instance();
+    CRC16()
+    {
+        // Empty Constructor
+    }
 
-    bool get_signal(
-            const SignalDef& signal_def,
-            SignalTypeBase** signal) const;
-
-    bool get_scaled_signal(
-            const SignalDef& signal_def,
-            SignalTypeScaled** signal) const;
-
-    size_t size() const;
-
-    bool update_packet(DataReader& reader);
-
-    bool write_packet(DataWriter& write);
-
-protected:
-    void init_signals();
-
-protected:
-    SignalTypeBase* signal_array[SignalDef::MAX_SIGNAL_COUNT];
-
-    CRC16 crc;
+    uint16_t get_checksum(const uint8_t* data, uint32_t size)
+    {
+        // TODO - This
+        (void)data;
+        (void)size;
+        return 0;
+    }
 };
 
 }
 
-#endif // TF_SIGNAL_DATABASE_H
+#endif // TF_SIGNAL_CRC16_H

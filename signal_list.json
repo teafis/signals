@@ -28,7 +28,7 @@
       "name": "gps_latitude",
       "description": "GPS latitude of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -38,7 +38,7 @@
       "name": "gps_longitude",
       "description": "GPS longitude of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -48,7 +48,7 @@
       "name": "altitude_msl",
       "description": "MSL altitude of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "ft",
       "resolution": 0.01
     },
@@ -58,7 +58,7 @@
       "name": "altitude_agl",
       "description": "AGL altitude of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "ft",
       "resolution": 0.01
     },
@@ -68,7 +68,7 @@
       "name": "altitude_rate",
       "description": "altitude rate of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "ft/s",
       "resolution": 0.01
     },
@@ -78,7 +78,7 @@
       "name": "vertical_speed",
       "description": "vertical speed of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "ft/s",
       "resolution": 0.01
     },
@@ -88,7 +88,7 @@
       "name": "heading_true",
       "description": "true heading of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -98,7 +98,7 @@
       "name": "heading_mag",
       "description": "magnetic heading of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -108,7 +108,7 @@
       "name": "ground_track",
       "description": "ground track of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -118,7 +118,7 @@
       "name": "magnetic_variation",
       "description": "current magnetic variation",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -128,7 +128,7 @@
       "name": "att_pitch",
       "description": "pitch attitude angle of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -138,7 +138,7 @@
       "name": "att_roll",
       "description": "roll attitude angle of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "deg",
       "resolution": "semi2deg"
     },
@@ -148,7 +148,7 @@
       "name": "speed_ias",
       "description": "indicated airspeed of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "kts",
       "resolution": 0.01
     },
@@ -158,7 +158,7 @@
       "name": "speed_gs",
       "description": "ground speed of the aircraft",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "kts",
       "resolution": 0.01
     },
@@ -168,7 +168,7 @@
       "name": "engine_rpm",
       "description": "RPM of the engine",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "rpm",
       "resolution": 0.01
     },
@@ -178,7 +178,7 @@
       "name": "oil_pressure",
       "description": "oil pressure for the engine",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "psi",
       "resolution": 0.01
     },
@@ -188,7 +188,7 @@
       "name": "oil_temperature",
       "description": "oil temperature for the engine",
       "timeout": 1000,
-      "type": "fixed",
+      "type": "scaled",
       "units": "degC",
       "resolution": 0.01
     }

@@ -15,34 +15,36 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#include "signal_id.h"
+#include "signal_def.h"
 
 using namespace efis_signals;
 
-SignalID::SignalID() :
+SignalDef::SignalDef() :
     category_id(0),
     sub_id(0)
 {
     // Empty constructor
 }
 
-SignalID::SignalID(
+SignalDef::SignalDef(
         const uint8_t category_id,
-        const uint8_t signal_id) :
+        const uint8_t sub_id,
+        const uint32_t timeout_millis) :
     category_id(category_id),
-    sub_id(signal_id)
+    sub_id(sub_id),
+    timeout_millis(timeout_millis)
 {
     // Empty Constructor
 }
 
-bool SignalID::operator==(const SignalID& other) const
+bool SignalDef::operator==(const SignalDef& other) const
 {
     return
             category_id == other.category_id &&
             sub_id == other.sub_id;
 }
 
-size_t SignalID::signal_index() const
+size_t SignalDef::signal_index() const
 {
     return (static_cast<size_t>(category_id) << 8) | sub_id;
 }

@@ -17,6 +17,8 @@
 
 #include "signal_database.h"
 
+#include "gen_signal_def.h"
+
 using namespace efis_signals;
 
 SignalDatabase::SignalDatabase()
@@ -37,18 +39,18 @@ SignalDatabase& SignalDatabase::get_instance()
 
 size_t SignalDatabase::size() const
 {
-    return SignalID::MAX_SIGNAL_COUNT;
+    return SignalDef::MAX_SIGNAL_COUNT;
 }
 
 bool SignalDatabase::update_packet(DataReader& reader)
 {
-    SignalTypeBase read_signal(SignalID(0, 0));
+    SignalTypeBase read_signal(SIGNAL_DEF_NULL);
     if (reader.bytes_available() >= read_signal.size() && read_signal.deserialize(reader))
     {
         reader.reset();
         SignalTypeBase* signal_to_update = nullptr;
 
-        if (!get_signal(read_signal.get_signal_id(), &signal_to_update))
+        if (!get_signal(read_signal.get_signal_def(), &signal_to_update))
         {
             return false;
         }
@@ -71,11 +73,17 @@ bool SignalDatabase::update_packet(DataReader& reader)
     }
 }
 
+bool SignalDatabase::write_packet(DataWriter& write)
+{
+    (void)write;
+    return false;
+}
+
 bool SignalDatabase::get_signal(
-        const SignalID& signal_id,
+        const SignalDef& signal_def,
         SignalTypeBase** signal) const
 {
-    const size_t signal_index = signal_id.signal_index();
+    const size_t signal_index = signal_def.signal_index();
     if (signal_index < size() && signal_array[signal_index] != nullptr)
     {
         *signal = signal_array[signal_index];
@@ -87,18 +95,18 @@ bool SignalDatabase::get_signal(
     }
 }
 
-bool SignalDatabase::get_fixed_signal(
-        const SignalID& signal_id,
-        SignalTypeFixed** signal) const
+bool SignalDatabase::get_scaled_signal(
+        const SignalDef& signal_def,
+        SignalTypeScaled** signal) const
 {
     // Obtain the base signal
     SignalTypeBase* base;
-    if (!get_signal(signal_id, &base))
+    if (!get_signal(signal_def, &base))
     {
         return false;
     }
 
     // Attempt to convert to a fixed type
-    *signal = dynamic_cast<SignalTypeFixed*>(base);
+    *signal = dynamic_cast<SignalTypeScaled*>(base);
     return *signal != nullptr;
 }

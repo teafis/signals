@@ -20,59 +20,41 @@
 
 #include "signal_type_base.h"
 
-#include <cstdint>
-#include <limits>
+#include "data_type_scaled.h"
 
 namespace efis_signals
 {
 
-class SignalTypeFixed : public SignalTypeBase
+class SignalTypeScaled : public SignalTypeBase
 {
 public:
-    SignalTypeFixed(const SignalID& signal, const double resolution) :
+    SignalTypeScaled(const SignalDef& signal, const double resolution) :
         SignalTypeBase(signal),
-        resolution(resolution),
-        value(0.0)
+        data(resolution)
     {
-
+        // Empty Constructor
     }
 
     void set_value(const double input)
     {
-        if (input > max_value())
-        {
-            value = max_value();
-        }
-        else if (input < min_value())
-        {
-            value = min_value();
-        }
-        else
-        {
-            value = input;
-        }
+        data.set_value(input);
     }
 
     double get_value() const
     {
-        return value;
+        return data.get_value();
     }
 
-    double max_value() const
+    const DataTypeScaled& get_data_value() const
     {
-        return std::numeric_limits<int32_t>::max() * resolution;
-    }
-
-    double min_value() const
-    {
-        return std::numeric_limits<int32_t>::min() * resolution;
+        return data;
     }
 
     virtual bool serialize(DataWriter& writer) const override
     {
         return
                 SignalTypeBase::serialize(writer) &&
-                writer.add_uint(get_data_value());
+                writer.add_uint(data.get_raw_value());
     }
 
     virtual bool deserialize(DataReader& reader) override
@@ -84,7 +66,7 @@ public:
 
         if (success)
         {
-            from_raw_value(raw_value);
+            data.set_raw_value(raw_value);
             return true;
         }
         else
@@ -99,19 +81,7 @@ public:
     }
 
 protected:
-    void from_raw_value(const uint32_t raw)
-    {
-        value = static_cast<double>(static_cast<int32_t>(raw)) * resolution;
-    }
-
-    uint32_t get_data_value() const
-    {
-        return static_cast<uint32_t>(static_cast<int32_t>(value / resolution));
-    }
-
-protected:
-    double resolution;
-    double value;
+    DataTypeScaled data;
 };
 
 }

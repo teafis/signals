@@ -83,6 +83,22 @@ bool DataReader::read_uint(uint32_t& val)
     }
 }
 
+bool DataReader::read_scaled(DataTypeScaled& val)
+{
+    uint32_t temp;
+    bool success = read_uint(temp);
+
+    if (success)
+    {
+        val.set_raw_value(temp);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 size_t DataReader::bytes_available() const
 {
     return size - current;
@@ -142,6 +158,11 @@ bool DataWriter::add_uint(const uint32_t val)
         add_ubyte(buffer[1]) &&
         add_ubyte(buffer[2]) &&
         add_ubyte(buffer[3]);
+}
+
+bool DataWriter::add_scaled(const DataTypeScaled& val)
+{
+    return add_uint(val.get_raw_value());
 }
 
 void DataWriter::reset()

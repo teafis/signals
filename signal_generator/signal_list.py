@@ -25,7 +25,7 @@ import pathlib
 import typing
 
 from .signal_def_base import SignalDefinitionBase
-from .signal_def_fixed import SignalDefinitionFixed
+from .signal_def_scaled import SignalDefinitionScaled
 
 
 class SignalList:
@@ -88,8 +88,8 @@ class SignalList:
             # Switch based on the signal type
             if sig_type == 'base':
                 sig_type_obj = SignalDefinitionBase
-            elif sig_type == 'fixed':
-                sig_type_obj = SignalDefinitionFixed
+            elif sig_type == 'scaled':
+                sig_type_obj = SignalDefinitionScaled
             else:
                 raise ValueError('Signal type "{:s}" unknown'.format(sig_type))
 

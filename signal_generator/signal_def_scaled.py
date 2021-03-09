@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-SignalFixed defines the fixed-resolution signal definition
+SignalFixed defines the scaled-resolution signal definition
 """
 
 import typing
@@ -24,7 +24,7 @@ import typing
 from .signal_def_base import SignalDefinitionBase
 
 
-class SignalDefinitionFixed(SignalDefinitionBase):
+class SignalDefinitionScaled(SignalDefinitionBase):
     """
     Class to maintain the definition for an analog signal type
     """
@@ -72,11 +72,16 @@ class SignalDefinitionFixed(SignalDefinitionBase):
         """
         resolution = sig_def['resolution']
         if isinstance(resolution, str):
-            resolution = SignalDefinitionFixed.RESOLUTION_MAP[resolution]
+            resolution = SignalDefinitionScaled.RESOLUTION_MAP[resolution]
         else:
             resolution = float(resolution)
 
-        return SignalDefinitionFixed(
-            units=sig_def['units'],
+        units = sig_def['units']
+
+        if not isinstance(units, str):
+            raise ValueError('units flag must be provided as a string')
+
+        return SignalDefinitionScaled(
+            units=units,
             resolution=resolution,
-            **SignalDefinitionFixed._get_base_args(sig_def=sig_def))
+            **SignalDefinitionScaled._get_base_args(sig_def=sig_def))

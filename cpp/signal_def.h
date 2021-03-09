@@ -15,8 +15,8 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef SIGNAL_ID_H
-#define SIGNAL_ID_H
+#ifndef TF_SIGNAL_DEF_H
+#define TF_SIGNAL_DEF_H
 
 #include <cstdint>
 #include <cstddef>
@@ -26,24 +26,26 @@ namespace efis_signals
 {
 
 /**
- * @brief The SignalID struct defines a signal identification
+ * @brief The SignalDef struct defines a signal identification
  * method to positively define signal types
  */
-struct SignalID
+struct SignalDef
 {
     /**
-     * @brief SignalID constructs a null signal ID instance
+     * @brief SignalDef constructs a null signal definition instance
      */
-    SignalID();
+    SignalDef();
 
     /**
-     * @brief SignalID constructs a signal ID instance
+     * @brief SignalDef constructs a signal definition instance
      * @param category_id is the category ID for the associated signal
-     * @param signal_id is the signal ID for the associated signal
+     * @param sub_id is the subcategory ID for the associated signal
+     * @param timeout_millis is the timeout of the signal in milliseconds
      */
-    SignalID(
+    SignalDef(
             const uint8_t category_id,
-            const uint8_t signal_id);
+            const uint8_t sub_id,
+            const uint32_t timeout_millis);
 
     /**
      * @brief category_id the category ID of the signal
@@ -56,11 +58,16 @@ struct SignalID
     uint8_t sub_id;
 
     /**
-     * @brief operator == defines an equality check between two SignalID objects
-     * @param other is the other SignalID to compare against the current one
+     * @brief timeout_millis defines how long, in milliseconds, the signal will be valid for after recipt
+     */
+    uint32_t timeout_millis;
+
+    /**
+     * @brief operator == defines an equality check between two SignalDef objects
+     * @param other is the other SignalDef to compare against the current one
      * @return True if the two signals are equal; otherwise false
      */
-    bool operator==(const SignalID& other) const;
+    bool operator==(const SignalDef& other) const;
 
     /**
      * @brief signal_index provides the
@@ -77,4 +84,4 @@ struct SignalID
 
 }
 
-#endif // SIGNAL_ID_H
+#endif // TF_SIGNAL_DEF_H
