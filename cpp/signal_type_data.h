@@ -35,7 +35,7 @@ public:
             const SignalDef& signal,
             const data_size_t size) :
         SignalTypeBase(signal),
-        data_size(0),
+        data_size(size),
         data(nullptr)
     {
         // Define the data array
@@ -62,11 +62,13 @@ public:
 
     SignalTypeData& operator=(const SignalTypeData& other)
     {
+        // Check for self-assignment
         if (this == &other)
         {
             return *this;
         }
 
+        // Allocate new data size if required
         if (data_size != other.data_size)
         {
             data_size = other.data_size;
@@ -79,10 +81,14 @@ public:
             data = new data_t[data_size];
         }
 
+        // Copy data values
         for (data_size_t i = 0; i < data_size; ++i)
         {
             data[i] = other.data[i];
         }
+
+        // Return the provided pointer
+        return *this;
     }
 
     bool set_value(const data_size_t index, const data_t value)
@@ -150,6 +156,15 @@ public:
     virtual size_t size() const override
     {
         return SignalTypeBase::size() + 4 + data_size;
+    }
+
+    virtual ~SignalTypeData()
+    {
+        if (data != nullptr)
+        {
+            delete[] data;
+            data = nullptr;
+        }
     }
 
 protected:

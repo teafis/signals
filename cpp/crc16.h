@@ -23,15 +23,27 @@
 namespace efis_signals
 {
 
+/**
+ * @brief The CRC16 class provides a CRC16 implementation for networking
+ */
 class CRC16
 {
 public:
+    /**
+     * @brief CRC16 constructs and generates parameters required for CRC generation
+     */
     CRC16()
     {
         // Empty Constructor
     }
 
-    uint16_t get_checksum(const uint8_t* data, uint32_t size)
+    /**
+     * @brief compute provides the CRC-16 checksum for the provided data
+     * @param data the data to check
+     * @param size the size of the data to read
+     * @return the associated CRC-16 for the data
+     */
+    uint16_t compute(const uint8_t* data, uint32_t size)
     {
         // TODO - This
         (void)data;
