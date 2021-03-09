@@ -29,34 +29,94 @@
 namespace efis_signals
 {
 
+/**
+ * @brief The SignalDatabase class provides an instance of a database object
+ * to store and provide the latest signal data type parameters for different
+ * signals, stored by a SignalDefinition object
+ */
 class SignalDatabase
 {
 private:
+    /**
+     * @brief SignalDatabase constructs the signal database object
+     */
     SignalDatabase();
 
 public:
+    /**
+     * @brief get_instance provides access to the singleton database object
+     * @return the singleton database object
+     */
     static SignalDatabase& get_instance();
 
+    /**
+     * @brief get_signal provides a signal of the provided definition, if available
+     * @param signal_def is the signal definition to search for
+     * @param signal stores the output location of the signal in memory if found
+     * @return true if the signal is found
+     */
     bool get_signal(
             const SignalDef& signal_def,
             SignalTypeBase** signal) const;
 
+    /**
+     * @brief get_scaled_signal provides the scaled signal definition, if available
+     * @param signal_def is the signal definition to search for
+     * @param signal
+     * @return
+     */
     bool get_scaled_signal(
             const SignalDef& signal_def,
             SignalTypeScaled** signal) const;
 
+    /**
+     * @brief size provides the overall size of the signal database
+     * @return provides the number of signals available in the dictionary
+     */
     size_t size() const;
 
-    bool update_packet(DataReader& reader);
+    /**
+     * @brief update_packet attempts to read the data contained in the reader
+     * into the dictionary and update any stored values within
+     * @param reader is the reader object containing the data to be read
+     * into the dictionary
+     * @return true if a signal was successfully read into the dictionary
+     */
+    bool read_data_into_dictionary(DataReader& reader);
 
-    bool write_packet(DataWriter& write);
+    /**
+     * @brief write_data_from_dictionary attempts to write the requested signal
+     * from the dictionary into the data writer, using the current FROM device
+     * and timestamp as the parameter values for the header
+     * @param signal is the signal to write into the object
+     * @param writer is the object to write the data into
+     * @return true if the signal is successfully writen into the data writer
+     */
+    bool write_data_from_dictionary(
+            const SignalDef& signal,
+            DataWriter& writer) const;
 
 protected:
+    /**
+     * @brief init_signals provides a function to initialize the signals within
+     * the database
+     */
     void init_signals();
 
 protected:
+    /**
+     * @brief signal_array provides the storage for locations to the signals
+     * stored within the database. The actual signals within the database
+     * are memory-managed separately and may be done in either the stack
+     * or the heap, depending on the usage. This array should be initialized
+     * within the init_signals function.
+     */
     SignalTypeBase* signal_array[SignalDef::MAX_SIGNAL_COUNT];
 
+    /**
+     * @brief crc provides an instance used to calculate the CRC of incoming and
+     * outgoing signals
+     */
     CRC16 crc;
 };
 

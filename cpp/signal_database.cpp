@@ -42,7 +42,7 @@ size_t SignalDatabase::size() const
     return SignalDef::MAX_SIGNAL_COUNT;
 }
 
-bool SignalDatabase::update_packet(DataReader& reader)
+bool SignalDatabase::read_data_into_dictionary(DataReader& reader)
 {
     SignalTypeBase read_signal(SIGNAL_DEF_NULL);
     if (reader.bytes_available() >= read_signal.size() && read_signal.deserialize(reader))
@@ -73,10 +73,19 @@ bool SignalDatabase::update_packet(DataReader& reader)
     }
 }
 
-bool SignalDatabase::write_packet(DataWriter& write)
+bool SignalDatabase::write_data_from_dictionary(
+        const SignalDef& signal,
+        DataWriter& writer) const
 {
-    (void)write;
-    return false;
+    SignalTypeBase* base_signal = nullptr;
+    if (!get_signal(signal, &base_signal))
+    {
+        return false;
+    }
+    else
+    {
+        return base_signal->serialize(writer);
+    }
 }
 
 bool SignalDatabase::get_signal(
