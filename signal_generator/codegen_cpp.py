@@ -63,7 +63,7 @@ def _signal_var_name(signal: SignalDefinitionBase) -> str:
     return 'signal_{:s}'.format(signal.name.lower())
 
 
-def _get_find_id_func_name() -> str:
+def _get_find_def_by_name_func_name() -> str:
     """
         Provides the name of the find by name function
         :return: the name of the get signal name by ID function
@@ -71,7 +71,7 @@ def _get_find_id_func_name() -> str:
     return 'get_signal_def_for_name'
 
 
-def _get_find_func_sig(with_namespace: bool) -> str:
+def _get_find_def_by_name_func_sig(with_namespace: bool) -> str:
     """
     Determines the function signature for the get signal by ID function
     :param with_namespace: determines if the namespace should be added
@@ -84,10 +84,10 @@ def _get_find_func_sig(with_namespace: bool) -> str:
 
     return 'bool {0:s}{1:s}(const std::string& name, SignalDef& signal)'.format(
         namespace_sec,
-        _get_find_id_func_name())
+        _get_find_def_by_name_func_name())
 
 
-def _get_find_name_func_name() -> str:
+def _get_find_name_by_def_func_name() -> str:
     """
     Provides the name of the find by definition function
     :return: the name of the get signal name by definition function
@@ -95,7 +95,7 @@ def _get_find_name_func_name() -> str:
     return 'get_signal_name_for_def'
 
 
-def _get_find_name_func_sig(with_namespace: bool) -> str:
+def _get_find_name_by_def_func_sig(with_namespace: bool) -> str:
     """
     Determines the function signature for the get signal name by ID function
     :param with_namespace: determines if the namespace should be added
@@ -108,7 +108,31 @@ def _get_find_name_func_sig(with_namespace: bool) -> str:
 
     return 'bool {0:s}{1:s}(const SignalDef& signal_def, std::string name)'.format(
         namespace_sec,
-        _get_find_name_func_name())
+        _get_find_name_by_def_func_name())
+
+
+def _get_find_def_by_cat_sub_id_func_name() -> str:
+    """
+    Provides the name of the find by cat/sub ID function
+    :return: the name of the get signal name by definition function
+    """
+    return 'get_signal_for_cat_sub_id'
+
+
+def _get_find_def_by_cat_sub_id_func_sig(with_namespace: bool) -> str:
+    """
+    Determines the function signature for the get signal by cat/sub ID function
+    :param with_namespace: determines if the namespace should be added
+    :return: the associated function signature
+    """
+    if with_namespace:
+        namespace_sec = '{:s}::'.format(_get_namespace_name())
+    else:
+        namespace_sec = ''
+
+    return 'bool {0:s}{1:s}(const uint8_t cat_id, const uint8_t sub_id, SignalDef& signal_def)'.format(
+        namespace_sec,
+        _get_find_def_by_cat_sub_id_func_name())
 
 
 def _generate_signal_def_hdr() -> CodegenFileCppHeader:
@@ -134,7 +158,7 @@ def _generate_signal_def_hdr() -> CodegenFileCppHeader:
 
     # Add the signal list version value
     get_def_version_sec = CodegenSection(signal_printer=None)
-    get_def_version_sec.init_list = ['static const uint32_t {:s};'.format(_get_signal_version_name())]
+    get_def_version_sec.init_list = ['extern const uint32_t {:s};'.format(_get_signal_version_name())]
     codegen.add_section(section=get_def_version_sec)
 
     # Add the signal definition list printer
@@ -144,25 +168,38 @@ def _generate_signal_def_hdr() -> CodegenFileCppHeader:
     get_by_name_sig_sec = CodegenSection(signal_printer=None)
     get_by_name_sig_sec.init_list = [
         '/**',
-        ' * @brief {:s} provides the signal definition for the provided name'.format(_get_find_id_func_name()),
+        ' * @brief {:s} provides the signal definition for the provided name'.format(_get_find_def_by_name_func_name()),
         ' * @param name is the name of the signal to find',
         ' * @param signal provides the resulting signal definition if found',
         ' * @return true if a signal for the given name is found',
         ' */',
-        '{:s};'.format(_get_find_func_sig(with_namespace=False))]
+        '{:s};'.format(_get_find_def_by_name_func_sig(with_namespace=False))]
     codegen.add_section(section=get_by_name_sig_sec)
 
     # Add the section for the get-name function
     get_def_name_sig_sec = CodegenSection(signal_printer=None)
     get_def_name_sig_sec.init_list = [
         '/**',
-        ' * @brief {:s} provides the name of the signal'.format(_get_find_name_func_name()),
+        ' * @brief {:s} provides the name of the signal'.format(_get_find_name_by_def_func_name()),
         ' * @param signal_def is the signal definition to try to find a name for',
         ' * @param name provides the name of the signal if found',
         ' * @return true if a name for the given signal is found',
         ' */',
-        '{:s};'.format(_get_find_name_func_sig(with_namespace=False))]
+        '{:s};'.format(_get_find_name_by_def_func_sig(with_namespace=False))]
     codegen.add_section(section=get_def_name_sig_sec)
+
+    # Add the section for the get-def by cat/sub ID function
+    get_def_sig_cat_sub_id_sec = CodegenSection(signal_printer=None)
+    get_def_sig_cat_sub_id_sec.init_list = [
+        '/**',
+        ' * @brief {:s} provides the name of the signal'.format(_get_find_def_by_cat_sub_id_func_name()),
+        ' * @param cat_id is the category ID of the signal to search for',
+        ' * @param sub_id is the subcategory ID of the signal to search for',
+        ' * @param signal_def provides the signal definition if found',
+        ' * @return true if a name for the given signal is found',
+        ' */',
+        '{:s};'.format(_get_find_def_by_cat_sub_id_func_sig(with_namespace=False))]
+    codegen.add_section(section=get_def_sig_cat_sub_id_sec)
 
     # Add include parameters
     codegen.add_include_file('signal_def.h')
@@ -226,7 +263,7 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
         indent=1,
         add_printer_item_separation=False)
     func_get_id_sec.init_list = [
-        '{:s}'.format(_get_find_func_sig(with_namespace=True)),
+        '{:s}'.format(_get_find_def_by_name_func_sig(with_namespace=True)),
         '{']
     func_get_id_sec.end_indent_list = [
         'else',
@@ -256,7 +293,7 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
         indent=1,
         add_printer_item_separation=False)
     func_get_name_sec.init_list = [
-        '{:s}'.format(_get_find_name_func_sig(with_namespace=True)),
+        '{:s}'.format(_get_find_name_by_def_func_sig(with_namespace=True)),
         '{']
     func_get_name_sec.end_indent_list = [
         'else',
@@ -265,6 +302,36 @@ def _generate_signal_def_src() -> CodegenFileCppSource:
         '}']
     func_get_name_sec.end_list = ['}']
     codegen.add_section(func_get_name_sec)
+
+    # Define and add the section for the get-name from ID  function
+    def func_get_def_by_cat_sub_id_printer(index: int, _, signal: SignalDefinitionBase) -> typing.List[str]:
+        if index == 0:
+            if_val = 'if'
+        else:
+            if_val = 'else if'
+
+        return [
+            '{0:s} (cat_id == {1:d} && sub_id == {2:d})'.format(if_val, signal.cat_id, signal.sub_id),
+            '{',
+            '    signal_def = {0:s};'.format(_signal_def_name(signal=signal)),
+            '    return true;',
+            '}'
+        ]
+
+    func_get_def_by_cat_sub_id_sec = CodegenSection(
+        signal_printer=func_get_def_by_cat_sub_id_printer,
+        indent=1,
+        add_printer_item_separation=False)
+    func_get_def_by_cat_sub_id_sec.init_list = [
+        '{:s}'.format(_get_find_def_by_cat_sub_id_func_sig(with_namespace=True)),
+        '{']
+    func_get_def_by_cat_sub_id_sec.end_indent_list = [
+        'else',
+        '{',
+        '    return false;',
+        '}']
+    func_get_def_by_cat_sub_id_sec.end_list = ['}']
+    codegen.add_section(func_get_def_by_cat_sub_id_sec)
 
     # Add include parameters
     codegen.add_include_file('gen_signal_def.h')

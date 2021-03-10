@@ -16,7 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-09 01:03:52 UTC
+// Creation Date: 2021-03-10 19:04:03 UTC
 
 #include "signal_def.h"
 #include <string>
@@ -26,6 +26,8 @@
 
 namespace efis_signals
 {
+
+extern const uint32_t SIGNAL_VERSION_NUM;
 
 /**
  * @brief SIGNAL_DEF_NULL is the signal for the empty signal for temporary use
@@ -132,6 +134,15 @@ bool get_signal_def_for_name(const std::string& name, SignalDef& signal);
  * @return true if a name for the given signal is found
  */
 bool get_signal_name_for_def(const SignalDef& signal_def, std::string name);
+
+/**
+ * @brief get_signal_for_cat_sub_id provides the name of the signal
+ * @param cat_id is the category ID of the signal to search for
+ * @param sub_id is the subcategory ID of the signal to search for
+ * @param signal_def provides the signal definition if found
+ * @return true if a name for the given signal is found
+ */
+bool get_signal_for_cat_sub_id(const uint8_t cat_id, const uint8_t sub_id, SignalDef& signal_def);
 
 }
 

@@ -44,13 +44,17 @@ size_t SignalDatabase::size() const
 
 bool SignalDatabase::read_data_into_dictionary(DataReader& reader)
 {
-    SignalTypeBase read_signal(SIGNAL_DEF_NULL);
-    if (reader.bytes_available() >= read_signal.size() && read_signal.deserialize(reader))
+    SignalBaseParameters base_params;
+    if (base_params.read_base(reader))
     {
-        reader.reset();
         SignalTypeBase* signal_to_update = nullptr;
+        SignalDef signal_def = SIGNAL_DEF_NULL;
 
-        if (!get_signal(read_signal.get_signal_def(), &signal_to_update))
+        if (!base_params.get_signal_def(signal_def))
+        {
+            return false;
+        }
+        else if (!get_signal(signal_def, &signal_to_update))
         {
             return false;
         }
@@ -58,7 +62,7 @@ bool SignalDatabase::read_data_into_dictionary(DataReader& reader)
         {
             return false;
         }
-        else if (!signal_to_update->can_update_base(read_signal))
+        else if (!signal_to_update->can_update_base(base_params))
         {
             return false;
         }
