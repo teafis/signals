@@ -16,13 +16,12 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-10 19:04:03 UTC
 
 #include "gen_signal_def.h"
 
 using namespace efis_signals;
 
-const uint32_t efis_signals::SIGNAL_VERSION_NUM = 0;
+const uint32_t efis_signals::SIGNAL_LIST_VERSION_NUM = 1;
 
 const SignalDef efis_signals::SIGNAL_DEF_NULL(0, 0, 1000);
 const SignalDef efis_signals::SIGNAL_DEF_GPS_LATITUDE(10, 10, 1000);
@@ -43,96 +42,96 @@ const SignalDef efis_signals::SIGNAL_DEF_ENGINE_RPM(20, 10, 1000);
 const SignalDef efis_signals::SIGNAL_DEF_OIL_PRESSURE(20, 20, 1000);
 const SignalDef efis_signals::SIGNAL_DEF_OIL_TEMPERATURE(20, 21, 1000);
 
-bool efis_signals::get_signal_def_for_name(const std::string& name, SignalDef& signal)
+bool efis_signals::get_signal_def_for_name(const std::string& name, SignalDef& signal_def)
 {
     if (name == "null")
     {
-        signal = SIGNAL_DEF_NULL;
+        signal_def = SIGNAL_DEF_NULL;
         return true;
     }
     else if (name == "gps_latitude")
     {
-        signal = SIGNAL_DEF_GPS_LATITUDE;
+        signal_def = SIGNAL_DEF_GPS_LATITUDE;
         return true;
     }
     else if (name == "gps_longitude")
     {
-        signal = SIGNAL_DEF_GPS_LONGITUDE;
+        signal_def = SIGNAL_DEF_GPS_LONGITUDE;
         return true;
     }
     else if (name == "altitude_msl")
     {
-        signal = SIGNAL_DEF_ALTITUDE_MSL;
+        signal_def = SIGNAL_DEF_ALTITUDE_MSL;
         return true;
     }
     else if (name == "altitude_agl")
     {
-        signal = SIGNAL_DEF_ALTITUDE_AGL;
+        signal_def = SIGNAL_DEF_ALTITUDE_AGL;
         return true;
     }
     else if (name == "altitude_rate")
     {
-        signal = SIGNAL_DEF_ALTITUDE_RATE;
+        signal_def = SIGNAL_DEF_ALTITUDE_RATE;
         return true;
     }
     else if (name == "vertical_speed")
     {
-        signal = SIGNAL_DEF_VERTICAL_SPEED;
+        signal_def = SIGNAL_DEF_VERTICAL_SPEED;
         return true;
     }
     else if (name == "heading_true")
     {
-        signal = SIGNAL_DEF_HEADING_TRUE;
+        signal_def = SIGNAL_DEF_HEADING_TRUE;
         return true;
     }
     else if (name == "heading_mag")
     {
-        signal = SIGNAL_DEF_HEADING_MAG;
+        signal_def = SIGNAL_DEF_HEADING_MAG;
         return true;
     }
     else if (name == "ground_track")
     {
-        signal = SIGNAL_DEF_GROUND_TRACK;
+        signal_def = SIGNAL_DEF_GROUND_TRACK;
         return true;
     }
     else if (name == "magnetic_variation")
     {
-        signal = SIGNAL_DEF_MAGNETIC_VARIATION;
+        signal_def = SIGNAL_DEF_MAGNETIC_VARIATION;
         return true;
     }
     else if (name == "att_pitch")
     {
-        signal = SIGNAL_DEF_ATT_PITCH;
+        signal_def = SIGNAL_DEF_ATT_PITCH;
         return true;
     }
     else if (name == "att_roll")
     {
-        signal = SIGNAL_DEF_ATT_ROLL;
+        signal_def = SIGNAL_DEF_ATT_ROLL;
         return true;
     }
     else if (name == "speed_ias")
     {
-        signal = SIGNAL_DEF_SPEED_IAS;
+        signal_def = SIGNAL_DEF_SPEED_IAS;
         return true;
     }
     else if (name == "speed_gs")
     {
-        signal = SIGNAL_DEF_SPEED_GS;
+        signal_def = SIGNAL_DEF_SPEED_GS;
         return true;
     }
     else if (name == "engine_rpm")
     {
-        signal = SIGNAL_DEF_ENGINE_RPM;
+        signal_def = SIGNAL_DEF_ENGINE_RPM;
         return true;
     }
     else if (name == "oil_pressure")
     {
-        signal = SIGNAL_DEF_OIL_PRESSURE;
+        signal_def = SIGNAL_DEF_OIL_PRESSURE;
         return true;
     }
     else if (name == "oil_temperature")
     {
-        signal = SIGNAL_DEF_OIL_TEMPERATURE;
+        signal_def = SIGNAL_DEF_OIL_TEMPERATURE;
         return true;
     }
     else

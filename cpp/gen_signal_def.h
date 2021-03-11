@@ -16,7 +16,6 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-10 19:04:03 UTC
 
 #include "signal_def.h"
 #include <string>
@@ -27,7 +26,7 @@
 namespace efis_signals
 {
 
-extern const uint32_t SIGNAL_VERSION_NUM;
+extern const uint32_t SIGNAL_LIST_VERSION_NUM;
 
 /**
  * @brief SIGNAL_DEF_NULL is the signal for the empty signal for temporary use
@@ -125,7 +124,7 @@ extern const SignalDef SIGNAL_DEF_OIL_TEMPERATURE;
  * @param signal provides the resulting signal definition if found
  * @return true if a signal for the given name is found
  */
-bool get_signal_def_for_name(const std::string& name, SignalDef& signal);
+bool get_signal_def_for_name(const std::string& name, SignalDef& signal_def);
 
 /**
  * @brief get_signal_name_for_def provides the name of the signal

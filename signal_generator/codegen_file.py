@@ -26,10 +26,46 @@ import typing
 from .signal_def_base import SignalDefinitionBase
 from .signal_list import SignalList
 
+SignalListCallable = typing.Callable[[SignalList], typing.List[str]]
 SignalPrinterCallable = typing.Callable[[int, SignalList, SignalDefinitionBase], typing.List[str]]
 
 
-class CodegenSection:
+class CodegenInterface:
+    """
+    Generic interface for code generation parameters
+    """
+
+    def generate_for_signal_list(self, signal_list: SignalList) -> typing.List[str]:
+        """
+        Generates the code for the given signal list
+        :param signal_list: the signal list to generate code for
+        :return: a list of lines within the generated code
+        """
+        raise NotImplementedError()
+
+
+class CodegenSingle(CodegenInterface):
+    """
+    Interface to provide a single list of code generation for the provided signal list
+    """
+
+    def __init__(self, printer: SignalListCallable):
+        """
+        Instantiates the single codegen parameter
+        :param printer:
+        """
+        self.printer = printer
+
+    def generate_for_signal_list(self, signal_list: SignalList) -> typing.List[str]:
+        """
+        Generates the code for the given signal list
+        :param signal_list: the signal list to generate code for
+        :return: a list of lines within the generated code
+        """
+        return self.printer(signal_list)
+
+
+class CodegenSection(CodegenInterface):
     """
     CodegenSection defines a section of code generation for a particular signal parameter
     """
@@ -37,17 +73,14 @@ class CodegenSection:
     def __init__(
             self,
             signal_printer: typing.Union[SignalPrinterCallable, None],
-            indent: int = 0,
             add_printer_item_separation: bool = True):
         """
         Initializes the codegen section with the provided signal parameters
         :param signal_printer: is the signal printer to use
-        :param indent: is the number of indentations for the repeated section
         :param add_printer_item_separation: determines whether to add separation to items
         in the looped section
         """
         # Save parameters
-        self.indent = max(indent, 0)
         self.signal_printer = signal_printer
         self.item_separation = add_printer_item_separation
 
@@ -63,12 +96,11 @@ class CodegenSection:
             self.signal_printer = _empty_printer
 
         # Initialize the init/end list not added to indentations
-        self.init_list = list()
-        self.end_list = list()
+        def _empty_bookend_printer(*_) -> typing.List[str]:
+            return list()
 
-        # Initialize the init/end list added to indentations
-        self.init_indent_list = list()
-        self.end_indent_list = list()
+        self.init_callable: SignalListCallable = _empty_bookend_printer
+        self.end_callable: SignalListCallable = _empty_bookend_printer
 
     def generate_for_signal_list(self, signal_list: SignalList) -> typing.List[str]:
         """
@@ -78,29 +110,12 @@ class CodegenSection:
         """
         # Define the initial list and add any initial parameters
         total_list = list()
-        total_list.extend(self.init_list)
-
-        # Define the update for indentation function for list parameters
-        def update_for_indent(input_list: typing.List[str]) -> typing.List[str]:
-            """
-            Adds an indentation to the level requested for lines if needed
-            :param input_list: the input list to update
-            :return: a list with indentation appended to the front of the list if
-            needed, or the original list if no indentation requested
-            """
-            if self.indent > 0:
-                indent_str = '    ' * self.indent
-                return ['{:s}{:s}'.format(indent_str, s) for s in input_list]
-            else:
-                return input_list
-
-        # Add the indentation init function
-        total_list.extend(update_for_indent(self.init_indent_list))
+        total_list.extend(self.init_callable(signal_list))
 
         # Loop through each signal
         for i, signal in enumerate(signal_list.definitions.values()):
             # Determine the text to write for the signal
-            signal_lines = update_for_indent(self.signal_printer(i, signal_list, signal))
+            signal_lines = self.signal_printer(i, signal_list, signal)
 
             # Add spacing if the number of signal lines is sufficient
             if i > 0 and len(signal_lines) > 1 and self.item_separation:
@@ -110,8 +125,7 @@ class CodegenSection:
             total_list.extend(signal_lines)
 
         # Add the ending init and ending function
-        total_list.extend(update_for_indent(self.end_indent_list))
-        total_list.extend(self.end_list)
+        total_list.extend(self.end_callable(signal_list))
 
         # Return the results
         return total_list
@@ -133,9 +147,9 @@ class CodegenFile:
         self.base_name = base_name
 
         # Define sections
-        self.sections: typing.List['CodegenSection'] = list()
+        self.sections: typing.List['CodegenInterface'] = list()
 
-    def add_section(self, section: 'CodegenSection') -> None:
+    def add_section(self, section: 'CodegenInterface') -> None:
         """
         Adds a code generation section to parameters to be output
         :param section: the section to add
@@ -222,167 +236,3 @@ class CodegenFile:
         # Write the file
         with (target_dir / self._gen_file_name()).open('w') as f:
             f.write('\n'.join(self.lines))
-
-
-class CodegenFileCpp(CodegenFile):
-    """
-    Class instance for a Codegen file for the C++ language
-    """
-
-    def __init__(self, base_name: str, namespace: str):
-        """
-        Initializes the instance with a base name that will be used to generate parameter items and a signal printer
-        function to be called for each signal in the list
-        :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param namespace: the namespace to associate with the current code generation file
-        """
-        super().__init__(base_name=base_name)
-        self.includes = list()
-        self.namespace = namespace
-
-    def add_include_file(self, file: str, system: bool = False) -> None:
-        """
-        Adds a file to the list of preprocessor includes to use
-        :param file: the file to include
-        :param system: determines if the file is a system file
-        """
-        if not system:
-            self.includes.append('#include "{:s}"'.format(file))
-        else:
-            self.includes.append('#include <{:s}>'.format(file))
-
-    def _gen_file_name(self) -> str:
-        """
-        An interface to provide the generated file's name
-        :return: the filename to write the file to
-        """
-        raise NotImplementedError()
-
-    def has_namespace(self) -> bool:
-        """
-        Determines if a namespace is associated with the current generator
-        :return: True if a namespace is provided
-        """
-        return len(self.namespace) > 0
-
-    def _print_init(self) -> None:
-        """
-        Interface instance to write initialization parameters to the source file
-        Prints header information and include directory information
-        """
-        super()._print_init()
-        self.lines.extend([
-            '// TeaFIS is a cockpit display for aircraft',
-            '// Copyright (C) 2021  Ian O\'Rourke',
-            '//',
-            '// This program is free software; you can redistribute it and/or modify',
-            '// it under the terms of the GNU General Public License as published by',
-            '// the Free Software Foundation; either version 2 of the License, or',
-            '// (at your option) any later version.',
-            '//',
-            '// This program is distributed in the hope that it will be useful,',
-            '// but WITHOUT ANY WARRANTY; without even the implied warranty of',
-            '// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the',
-            '// GNU General Public License for more details.',
-            '//',
-            '// You should have received a copy of the GNU General Public License along',
-            '// with this program; if not, write to the Free Software Foundation, Inc.,',
-            '// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.',
-            '',
-            '// This file is auto-generated',
-            '// Creation Date: {0:s} UTC'.format(self._date_string()),
-            ''
-            ])
-        if len(self.includes) > 0:
-            self.lines.extend(self.includes)
-            self.lines.append('')
-
-
-class CodegenFileCppHeader(CodegenFileCpp):
-    """
-    Class instance for a Codegen header file for the C++ language
-    """
-
-    def __init__(self, base_name: str, namespace: str = ''):
-        """
-        Initializes the instance with a base name that will be used to generate parameter items and a signal printer
-        function to be called for each signal in the list
-        :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param namespace: the namespace to associate with the current code generation file
-        """
-        super().__init__(base_name=base_name, namespace=namespace)
-
-    def _header_guard(self) -> str:
-        """
-        Provides the name of the header guard for the header file
-        :return: the header guard string
-        """
-        return 'TF_{:s}_H'.format(self._gen_base_name().upper())
-
-    def _gen_file_name(self) -> str:
-        """
-        Provides the file name to write
-        :return: the file name to write the generated file to
-        """
-        return '{:s}.h'.format(self._gen_base_name())
-
-    def _print_init(self) -> None:
-        """
-        Adds additional parameters to the write buffer for the header guard and the namespace name
-        """
-        super()._print_init()
-        self.lines.extend([
-            '#ifndef {:s}'.format(self._header_guard()),
-            '#define {:s}'.format(self._header_guard()),
-            ''])
-
-        if self.has_namespace():
-            self.lines.extend([
-                'namespace {:s}'.format(self.namespace),
-                '{',
-                ''])
-
-    def _print_end(self) -> None:
-        """
-        Adds additional parameters to the write buffer for ending parameter values
-        """
-        if self.has_namespace():
-            self.lines.extend(['', '}'])
-
-        self.lines.extend([
-            '',
-            '#endif // {:s}'.format(self._header_guard()),
-            ''])
-
-        super()._print_end()
-
-
-class CodegenFileCppSource(CodegenFileCpp):
-    """
-    Class instance for a Codegen source file for the C++ language
-    """
-
-    def __init__(self, base_name: str, namespace: str = ''):
-        """
-        Initializes the instance with a base name that will be used to generate parameter items and a signal printer
-        function to be called for each signal in the list
-        :param base_name: the base name of the generated file (signal_id or signal_database, for example)
-        :param namespace: the namespace to associate with the current code generation file
-        """
-        super().__init__(base_name=base_name, namespace=namespace)
-
-    def _gen_file_name(self) -> str:
-        """
-        Provides the file name to write
-        :return: the file name to write the generated file to
-        """
-        return '{:s}.cpp'.format(self._gen_base_name())
-
-    def _print_init(self) -> None:
-        """
-        Adds additional parameters to the write buffer for the header guard and the namespace name
-        """
-        super()._print_init()
-        if self.has_namespace():
-            self.lines.append('using namespace {:s};'.format(self.namespace))
-            self.lines.append('')

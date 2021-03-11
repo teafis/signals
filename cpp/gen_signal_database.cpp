@@ -16,7 +16,6 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 // This file is auto-generated
-// Creation Date: 2021-03-10 19:04:03 UTC
 
 #include "signal_database.h"
 #include "signal_type_base.h"
