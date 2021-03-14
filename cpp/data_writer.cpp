@@ -15,7 +15,7 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#include "data_common.h"
+#include "data_writer.h"
 
 #ifdef __linux__
 #include <arpa/inet.h>
@@ -25,98 +25,6 @@
 
 namespace efis_signals
 {
-
-DataReader::DataReader() :
-    buffer(nullptr),
-    size(0),
-    current(0)
-{
-    // Empty Constructor
-}
-
-bool DataReader::read_ubyte(uint8_t& val)
-{
-    if (bytes_available() >= 1)
-    {
-        val = buffer[current];
-        current += 1;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool DataReader::read_ushort(uint16_t& val)
-{
-    uint8_t vals[2];
-
-    if (read_ubyte(vals[0]) && read_ubyte(vals[1]))
-    {
-        const uint16_t* ptr = reinterpret_cast<uint16_t*>(vals);
-        val = ntohs(*ptr);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool DataReader::read_uint(uint32_t& val)
-{
-    uint8_t vals[4];
-
-    if (read_ubyte(vals[0]) &&
-            read_ubyte(vals[1]) &&
-            read_ubyte(vals[2]) &&
-            read_ubyte(vals[3]))
-    {
-        const uint32_t* ptr = reinterpret_cast<uint32_t*>(vals);
-        val = ntohl(*ptr);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool DataReader::read_scaled(DataTypeScaled& val)
-{
-    uint32_t temp;
-    bool success = read_uint(temp);
-
-    if (success)
-    {
-        val.set_raw_value(temp);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-size_t DataReader::bytes_available() const
-{
-    return size - current;
-}
-
-void DataReader::set_buffer(
-        const uint8_t* const buffer,
-        const size_t size)
-{
-    this->buffer = buffer;
-    this->size = size;
-    reset();
-}
-
-void DataReader::reset()
-{
-    current = 0;
-}
 
 DataWriter::DataWriter() :
     current(0),
