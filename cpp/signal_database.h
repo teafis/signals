@@ -62,12 +62,43 @@ public:
     /**
      * @brief get_scaled_signal provides the scaled signal definition, if available
      * @param signal_def is the signal definition to search for
-     * @param signal
-     * @return
+     * @param signal stores the return signal value if found
+     * @return true if the scalled signal is found
      */
     bool get_scaled_signal(
             const SignalDef& signal_def,
             SignalTypeScaled** signal) const;
+
+    /**
+     * @brief get_signal_type provides the signal of the provided type, if available
+     * @param signal_def is the signal definition to search for
+     * @param signal stores the return signal value if found. Must be an instance
+     * of the SignalTypeBase class or a subclass
+     * @return  true if the signal of the provided type is found
+     */
+    template <typename T>
+    bool get_signal_type(
+            const SignalDef& signal_def,
+            T** signal) const
+    {
+        // Ensure that the provided type is an instance of the SignalTypeBase
+        static_assert(
+            std::is_base_of<SignalTypeBase, T>::value,
+            "get_signal_type may only be called with instances of SignalTypeBase");
+
+         // Obtain the base class signal
+        SignalTypeBase* base;
+        if (!get_signal(signal_def, &base))
+        {
+            return false;
+        }
+        else
+        {
+            // Try to convert the base class into the requested type
+            *signal = dynamic_cast<T*>(base);
+            return *signal != nullptr;
+        }
+    }
 
     /**
      * @brief size provides the overall size of the signal database

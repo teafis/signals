@@ -112,14 +112,7 @@ bool SignalDatabase::get_scaled_signal(
         const SignalDef& signal_def,
         SignalTypeScaled** signal) const
 {
-    // Obtain the base signal
-    SignalTypeBase* base;
-    if (!get_signal(signal_def, &base))
-    {
-        return false;
-    }
-
-    // Attempt to convert to a fixed type
-    *signal = dynamic_cast<SignalTypeScaled*>(base);
-    return *signal != nullptr;
+    return get_signal_type(
+                signal_def,
+                signal);
 }
