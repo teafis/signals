@@ -25,6 +25,10 @@ namespace efis_signals
 
 using timestamp_t = uint32_t;
 
+/**
+ * @brief get_millis provides the current time in milliseconds for the signal
+ * @return the current milliseconds from program start
+ */
 timestamp_t get_millis();
 
 }
