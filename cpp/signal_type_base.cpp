@@ -77,11 +77,10 @@ bool SignalTypeBase::update_header(const SignalHeader& other)
 
 bool SignalTypeBase::is_valid() const
 {
-    // TODO - Document
+    const bool priority_valid = (header.priority & 0x80) > 0;
+    const bool timeout_valid = get_millis() - updated_time <= header.get_signal_def().timeout_millis;
 
-    return
-        (header.priority & 0x80) > 0 &&
-        (get_millis() - updated_time) <= header.get_signal_def().timeout_millis;
+    return priority_valid && timeout_valid;
 }
 
 size_t SignalTypeBase::packet_size() const
