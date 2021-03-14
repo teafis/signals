@@ -26,6 +26,8 @@
 
 #include "signal_time.h"
 
+#include "signal_base_parameters.h"
+
 #include <chrono>
 
 namespace efis_signals
@@ -36,53 +38,6 @@ enum class SignalSourceType
     None = 0,
     Transmitted = 1,
     Received = 2
-};
-
-struct SignalBaseParameters
-{
-    uint8_t cat_id;
-    uint8_t sub_id;
-    uint8_t priority;
-    uint8_t from_device;
-    uint32_t timestamp;
-
-    SignalBaseParameters() :
-        cat_id(0),
-        sub_id(0),
-        priority(0),
-        from_device(0),
-        timestamp(0)
-    {
-        // Empty Constructor
-    }
-
-    bool write_base(DataWriter& writer) const
-    {
-        return
-                writer.add_ubyte(from_device) &&
-                writer.add_ubyte(priority) &&
-                writer.add_ubyte(cat_id) &&
-                writer.add_ubyte(sub_id) &&
-                writer.add_ubyte(timestamp);
-    }
-
-    bool read_base(DataReader& reader)
-    {
-        return
-                reader.read_ubyte(from_device) &&
-                reader.read_ubyte(priority) &&
-                reader.read_ubyte(cat_id) &&
-                reader.read_ubyte(sub_id) &&
-                reader.read_uint(timestamp);
-    }
-
-    bool get_signal_def(SignalDef& signal_def)
-    {
-        return get_signal_for_cat_sub_id(
-                    cat_id,
-                    sub_id,
-                    signal_def);
-    }
 };
 
 class SignalTypeBase
@@ -108,21 +63,30 @@ public:
         return is_receive();
     }
 
-    bool can_update_base(const SignalBaseParameters& other) const
-    {
-        return
-                is_receive() &&
-                other.cat_id == parameters.cat_id &&
-                other.sub_id == parameters.sub_id &&
-                (
-                    !is_valid() ||
-                    other.priority > parameters.priority ||
-                    (other.from_device == parameters.from_device && other.timestamp >= parameters.timestamp));
-    }
-
     bool update_base(const SignalBaseParameters& other)
     {
-        if (is_receive())
+        // Ensure that the ID of the signal matches
+        const bool id_matches =
+                other.cat_id == parameters.cat_id &&
+                other.sub_id == parameters.sub_id;
+
+        // Allow replacement if the new priority is higher than the existing priority
+        const bool replace_higher_priority = other.priority > parameters.priority;
+
+        // Allow replacement if the parameter is from the same device and the timestamp has increased
+        const bool replace_higher_timestamp =
+                other.from_device == parameters.from_device &&
+                other.timestamp >= parameters.timestamp;
+
+        // Allow replacement if any of the priority, timestamp is okay, or the current signal
+        // is not valid
+        const bool can_replace =
+                !is_valid() ||
+                replace_higher_priority ||
+                replace_higher_timestamp;
+
+        // Check if we can update the base parameters
+        if (is_receive() && id_matches && can_replace)
         {
             parameters.from_device = other.from_device;
             parameters.priority = other.priority;

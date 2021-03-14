@@ -62,13 +62,18 @@ bool SignalDatabase::read_data_into_dictionary(DataReader& reader)
         {
             return false;
         }
-        else if (!signal_to_update->can_update_base(base_params))
+        else if (!signal_to_update->update_base(base_params))
         {
             return false;
         }
+        else if (signal_to_update->deserialize(reader))
+        {
+            signal_to_update->set_updated_time_to_now();
+            return true;
+        }
         else
         {
-            return signal_to_update->deserialize(reader);
+            return false;
         }
     }
     else
