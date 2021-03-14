@@ -19,7 +19,7 @@
       "sub_id": 0,
       "name": "null",
       "description": "empty signal for temporary use",
-      "timeout": 1000,
+      "timeout": 0,
       "type": "base"
     },
     {

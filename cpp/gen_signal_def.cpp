@@ -23,7 +23,7 @@ using namespace efis_signals;
 
 const uint32_t efis_signals::SIGNAL_LIST_VERSION_NUM = 1;
 
-const SignalDef efis_signals::SIGNAL_DEF_NULL(0, 0, 1000);
+const SignalDef efis_signals::SIGNAL_DEF_NULL(0, 0, 0);
 const SignalDef efis_signals::SIGNAL_DEF_GPS_LATITUDE(10, 10, 1000);
 const SignalDef efis_signals::SIGNAL_DEF_GPS_LONGITUDE(10, 11, 1000);
 const SignalDef efis_signals::SIGNAL_DEF_ALTITUDE_MSL(10, 20, 1000);
