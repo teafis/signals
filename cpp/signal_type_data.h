@@ -25,155 +25,100 @@ namespace efis_signals
 
 // TODO - Replace with VarArray?
 
-// TODO - Documentation
-// TODO - Split into CPP file
-
+/**
+ * @brief The SignalTypeData class provides a signal type for
+ * an array of byte values
+ */
 class SignalTypeData : public SignalTypeBase
 {
 public:
+    // Define common types
     using data_size_t = uint32_t;
     using data_t = uint8_t;
 
+    /**
+     * @brief SignalTypeData constructs the data array signal
+     * @param signal is the signal definition to use
+     * @param size is the base size of the data
+     */
     SignalTypeData(
             const SignalDef& signal,
-            const data_size_t size) :
-        SignalTypeBase(signal),
-        data_size(size),
-        data(nullptr)
-    {
-        // Define the data array
-        data = new data_t[data_size];
-        for (data_size_t i = 0; i < data_size; ++i)
-        {
-            data[i] = 0;
-        }
-    }
+            const data_size_t size);
 
-    SignalTypeData(const SignalTypeData& other) :
-        SignalTypeBase(other),
-        data_size(other.data_size),
-        data(nullptr)
+    /**
+     * @brief SignalTypeData is a copy constructor for the data values
+     * @param other is the other SignalTypeData to construct from
+     */
+    SignalTypeData(const SignalTypeData& other);
 
-    {
-        // Define the data array
-        data = new data_t[data_size];
-        for (data_size_t i = 0; i < data_size; ++i)
-        {
-            data[i] = other.data[i];
-        }
-    }
+    /**
+     * @brief operator = is the assignment operator for the data type singal
+     * @param other is the other SignalTypeData to assign from
+     * @return the original instance updated to be equal to the other value
+     */
+    SignalTypeData& operator=(const SignalTypeData& other);
 
-    SignalTypeData& operator=(const SignalTypeData& other)
-    {
-        // Check for self-assignment
-        if (this == &other)
-        {
-            return *this;
-        }
+    /**
+     * @brief set_value sets the array index to the given value (Tx only)
+     * @param index is the array index to set
+     * @param value is the value to set
+     * @return true if the value was successfully set
+     */
+    bool set_value(
+            const data_size_t index,
+            const data_t value);
 
-        // Allocate new data size if required
-        if (data_size != other.data_size)
-        {
-            data_size = other.data_size;
+    /**
+     * @brief get_value gets the array index and assigns to the value provided
+     * @param index is the array index to get
+     * @param value is the assigned to the current data value
+     * @return true if the value can be gotten
+     */
+    bool get_value(
+            const data_size_t index,
+            data_t& value) const;
 
-            if (data != nullptr)
-            {
-                delete[] data;
-            }
+    /**
+     * @brief data_size provides the size of the data array
+     * @return the array size
+     */
+    data_size_t data_size() const;
 
-            data = new data_t[data_size];
-        }
+    /**
+     * @brief serialize writes signal value to the array (Tx only)
+     * @param writer is the data to write to
+     * @return true if able to be written
+     */
+    virtual bool serialize(DataWriter& writer) const override;
 
-        // Copy data values
-        for (data_size_t i = 0; i < data_size; ++i)
-        {
-            data[i] = other.data[i];
-        }
+    /**
+     * @brief deserialize reads signal from the reader (Rx only)
+     * @param reader is the data to read from
+     * @return true if able to be read
+     */
+    virtual bool deserialize(DataReader& reader) override;
 
-        // Return the provided pointer
-        return *this;
-    }
+    /**
+     * @brief size provides the size of the packet, not including the header
+     * @return the packet size
+     */
+    virtual size_t packet_size() const override;
 
-    bool set_value(const data_size_t index, const data_t value)
-    {
-        if (is_transmit() && index < data_size)
-        {
-            data[index] = value;
-            set_updated_time_to_now();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool get_value(const data_size_t index, data_t& value) const
-    {
-        if (index < data_size)
-        {
-            value = data[index];
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    virtual bool serialize(DataWriter& writer) const override
-    {
-        bool success =
-                SignalTypeBase::serialize(writer) &&
-                writer.add_uint(data_size);
-
-        for (data_size_t i = 0; i < data_size; ++i)
-        {
-            success &= writer.add_ubyte(data[i]);
-        }
-
-        return success;
-    }
-
-    virtual bool deserialize(DataReader& reader) override
-    {
-        data_size_t new_size;
-        bool success =
-                SignalTypeBase::deserialize(reader) &&
-                reader.read_uint(new_size);
-
-        if (success && new_size == data_size)
-        {
-            for (data_size_t i = 0; i < data_size; ++i)
-            {
-                success &= reader.read_ubyte(data[i]);
-            }
-
-            return success;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    virtual size_t size() const override
-    {
-        return SignalTypeBase::size() + 4 + data_size;
-    }
-
-    virtual ~SignalTypeData()
-    {
-        if (data != nullptr)
-        {
-            delete[] data;
-            data = nullptr;
-        }
-    }
+    /**
+     * @brief ~SignalTypeData provides the destructor for the data array
+     */
+    virtual ~SignalTypeData();
 
 protected:
-    data_size_t data_size;
-    data_t* data;
+    /**
+     * @brief data_array_size provides the size of the data array
+     */
+    data_size_t data_array_size;
+
+    /**
+     * @brief data_array provides the actual data values for the array
+     */
+    data_t* data_array;
 };
 
 }

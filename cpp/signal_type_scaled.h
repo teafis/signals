@@ -28,72 +28,67 @@
 namespace efis_signals
 {
 
+/**
+ * @brief The SignalTypeScaled class provides a signal type
+ * to hold a floating point value scaled into a 4-byte integer
+ * using 2's complement
+ */
 class SignalTypeScaled : public SignalTypeBase
 {
 public:
-    SignalTypeScaled(const SignalDef& signal, const double resolution) :
-        SignalTypeBase(signal),
-        data(resolution)
-    {
-        // Empty Constructor
-    }
+    /**
+     * @brief SignalTypeScaled constructs the scaled data type
+     * @param signal is the signal definition to use
+     * @param resolution is the resolution of the scaled data
+     */
+    SignalTypeScaled(
+            const SignalDef& signal,
+            const double resolution);
 
-    bool set_value(const double input)
-    {
-        if (is_transmit())
-        {
-            data.set_value(input);
-            set_updated_time_to_now();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    /**
+     * @brief set_value sets the scaled data value (Tx only)
+     * @param input is the new value to set
+     * @return true if the value can be set
+     */
+    bool set_value(const double input);
 
-    double get_value() const
-    {
-        return data.get_value();
-    }
+    /**
+     * @brief get_value provides the current scaled value
+     * @return the signal value
+     */
+    double get_value() const;
 
-    const DataTypeScaled& get_data_value() const
-    {
-        return data;
-    }
+    /**
+     * @brief get_data_value provides the underlying scaled data type
+     * @return the underlying scaled data type
+     */
+    const DataTypeScaled& get_data_value() const;
 
-    virtual bool serialize(DataWriter& writer) const override
-    {
-        return
-                SignalTypeBase::serialize(writer) &&
-                writer.add_uint(data.get_raw_value());
-    }
+    /**
+     * @brief serialize writes signal (Tx only)
+     * @param writer is the data to write to
+     * @return true if able to be written
+     */
+    virtual bool serialize(DataWriter& writer) const override;
 
-    virtual bool deserialize(DataReader& reader) override
-    {
-        uint32_t raw_value = 0;
-        const bool success =
-                SignalTypeBase::deserialize(reader) &&
-                reader.read_uint(raw_value);
+    /**
+     * @brief deserialize reads the signal from the reader (Rx only)
+     * @param reader is the data to read from
+     * @return true if able to be read
+     */
+    virtual bool deserialize(DataReader& reader) override;
 
-        if (success)
-        {
-            data.set_raw_value(raw_value);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    virtual size_t size() const override
-    {
-        return SignalTypeBase::size() + 4;
-    }
+    /**
+     * @brief size provides the size of the packet, not including the header
+     * @return the packet size
+     */
+    virtual size_t packet_size() const override;
 
 protected:
-    DataTypeScaled data;
+    /**
+     * @brief data provides the underlying data value
+     */
+    DataTypeScaled value;
 };
 
 }

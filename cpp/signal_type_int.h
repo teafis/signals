@@ -20,62 +20,59 @@
 
 #include "signal_type_base.h"
 
-#include "data_type_scaled.h"
-
-// TODO - Documentation
-// TODO - Split into CPP file
-
 namespace efis_signals
 {
 
+/**
+ * @brief The SignalTypeInteger class provides a signal type
+ * to hold a 4-byte unsigned integer value
+ */
 class SignalTypeInteger : public SignalTypeBase
 {
 public:
-    SignalTypeInteger(const SignalDef& signal) :
-        SignalTypeBase(signal)
-    {
-        // Empty Constructor
-    }
+    /**
+     * @brief SignalTypeInteger constructs the integer signal
+     * @param signal is the signal definition to use
+     */
+    SignalTypeInteger(const SignalDef& signal);
 
-    bool set_value(const uint32_t input)
-    {
-        if (is_transmit())
-        {
-            value = input;
-            set_updated_time_to_now();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    /**
+     * @brief set_value sets the integer value (Tx only)
+     * @param input is the new value to set
+     * @return true if the value can be set
+     */
+    bool set_value(const uint32_t input);
 
-    uint32_t get_value() const
-    {
-        return value;
-    }
+    /**
+     * @brief get_value provides the integer value
+     * @return the signal value
+     */
+    uint32_t get_value() const;
 
-    virtual bool serialize(DataWriter& writer) const override
-    {
-        return
-                SignalTypeBase::serialize(writer) &&
-                writer.add_uint(value);
-    }
+    /**
+     * @brief serialize writes signal (Tx only)
+     * @param writer is the data to write to
+     * @return true if able to be written
+     */
+    virtual bool serialize(DataWriter& writer) const override;
 
-    virtual bool deserialize(DataReader& reader) override
-    {
-        return
-                SignalTypeBase::deserialize(reader) &&
-                reader.read_uint(value);
-    }
+    /**
+     * @brief deserialize reads the signal from the reader (Rx only)
+     * @param reader is the data to read from
+     * @return true if able to be read
+     */
+    virtual bool deserialize(DataReader& reader) override;
 
-    virtual size_t size() const override
-    {
-        return SignalTypeBase::size() + 4;
-    }
+    /**
+     * @brief size provides the size of the packet, not including the header
+     * @return the packet size
+     */
+    virtual size_t packet_size() const override;
 
 protected:
+    /**
+     * @brief value is the underlying data value
+     */
     uint32_t value;
 };
 

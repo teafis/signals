@@ -26,13 +26,18 @@
 
 #include "signal_time.h"
 
-#include "signal_base_parameters.h"
+#include "signal_header.h"
 
 #include <chrono>
 
 namespace efis_signals
 {
 
+/**
+ * @brief The SignalSourceType enum provides signal source
+ * type information for a given signal, including transmit
+ * and receive
+ */
 enum class SignalSourceType
 {
     None = 0,
@@ -40,149 +45,126 @@ enum class SignalSourceType
     Received = 2
 };
 
+/**
+ * @brief The SignalTypeBase class provides the base class
+ * for all signal types to be used
+ */
 class SignalTypeBase
 {
 public:
-    SignalTypeBase(const SignalDef& signal) :
-        signal_def(signal),
-        source_type(SignalSourceType::Received),
-        updated_time(0)
-    {
-        // Set Base Parameters
-        parameters.cat_id = signal_def.category_id;
-        parameters.sub_id = signal_def.sub_id;
-    }
+    /**
+     * @brief SignalTypeBase defines the base signal class
+     * @param signal is the signal definition to construct
+     * the signal with
+     */
+    SignalTypeBase(const SignalDef& signal);
 
-    virtual bool serialize(DataWriter&) const
-    {
-        return is_transmit();
-    }
+    /**
+     * @brief serialize writes data information to the writer,
+     * not including the header (Tx only)
+     * @return true if the data is able to be written
+     */
+    virtual bool serialize(DataWriter&) const;
 
-    virtual bool deserialize(DataReader&)
-    {
-        return is_receive();
-    }
+    /**
+     * @brief deserialize reads data from the data reader,
+     * not including the header (Rx only)
+     * @return true if the dta is able to be written
+     */
+    virtual bool deserialize(DataReader&);
 
-    bool update_base(const SignalBaseParameters& other)
-    {
-        // Ensure that the ID of the signal matches
-        const bool id_matches =
-                other.cat_id == parameters.cat_id &&
-                other.sub_id == parameters.sub_id;
+    /**
+     * @brief update_header attempts to update the signal header
+     * from the other header provided (presumably read from the
+     * network). The header may only be updated if the category
+     * and sub ID's match, and the update rules state that
+     * the current header may be updated (e.g., the signal is
+     * currently invalid, the new timestamp is greater than the
+     * last signal's timestamp, or the other header has a higher
+     * priority). (Rx only)
+     *
+     * Note that updates may only occur if the signal is a
+     * receiving signal
+     * @param other is the other header to use to update.
+     * @return true if the header was successfully updated
+     */
+    bool update_header(const SignalHeader& other);
 
-        // Allow replacement if the new priority is higher than the existing priority
-        const bool replace_higher_priority = other.priority > parameters.priority;
+    /**
+     * @brief is_valid determines if the signal is valid, based on
+     * timeout and priority validity parameters
+     * @return true if the signal is valid
+     */
+    bool is_valid() const;
 
-        // Allow replacement if the parameter is from the same device and the timestamp has increased
-        const bool replace_higher_timestamp =
-                other.from_device == parameters.from_device &&
-                other.timestamp >= parameters.timestamp;
+    /**
+     * @brief size determines the size of the data packet, not including
+     * the header
+     * @return packet size in bytes
+     */
+    virtual size_t packet_size() const;
 
-        // Allow replacement if any of the priority, timestamp is okay, or the current signal
-        // is not valid
-        const bool can_replace =
-                !is_valid() ||
-                replace_higher_priority ||
-                replace_higher_timestamp;
+    /**
+     * @brief set_updated_time_to_now updates the last updated time
+     * to the current time value. If Tx, will also update the header
+     * updated timestamp to the current timestamp
+     */
+    void set_updated_time_to_now();
 
-        // Check if we can update the base parameters
-        if (is_receive() && id_matches && can_replace)
-        {
-            parameters.from_device = other.from_device;
-            parameters.priority = other.priority;
-            parameters.timestamp = other.timestamp;
-            set_updated_time_to_now();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    /**
+     * @brief set_source_type updates the signal's source type
+     * @param type is the type to update the signal to
+     */
+    void set_source_type(const SignalSourceType type);
 
-    const SignalDef& get_signal_def() const
-    {
-        return signal_def;
-    }
+    /**
+     * @brief set_priority attempts to set the priority of the signal (Tx only)
+     * @param priority is the new priority to set
+     * @return true if the priority was successfully set
+     */
+    bool set_priority(const uint8_t priority);
 
-    bool is_valid() const
-    {
-        // TODO - Document
+    /**
+     * @brief set_from_device attempts to set the from_device of the signal (Tx only)
+     * @param from_device is the new from_device to set
+     * @return true if the from_deivce was successfully set
+     */
+    bool set_from_device(const uint8_t from_device);
 
-        return
-            (parameters.priority & 0x80) > 0 &&
-            (get_millis() - updated_time) <= signal_def.timeout_millis;
-    }
-
-    virtual size_t size() const
-    {
-        return 0;
-    }
-
-    void set_updated_time_to_now()
-    {
-        updated_time = get_millis();
-        if (is_transmit())
-        {
-            parameters.timestamp = get_millis();
-        }
-    }
-
-    void set_source_type(const SignalSourceType type)
-    {
-        source_type = type;
-    }
-
-    bool set_priority(const uint8_t priority)
-    {
-        if (is_transmit())
-        {
-            parameters.priority = priority;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool set_from_device(const uint8_t from_device)
-    {
-        if (is_transmit())
-        {
-            parameters.from_device = from_device;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    const SignalBaseParameters& get_parameters() const
-    {
-        return parameters;
-    }
+    /**
+     * @brief get_header provides the current header
+     * @return the signal header
+     */
+    const SignalHeader& get_header() const;
 
 protected:
-    bool is_receive() const
-    {
-        return source_type == SignalSourceType::Received;
-    }
+    /**
+     * @brief is_receive determines if the signal is receive
+     * @return true if the signal is Rx
+     */
+    bool is_receive() const;
 
-    bool is_transmit() const
-    {
-        return source_type == SignalSourceType::Transmitted;
-    }
+    /**
+     * @brief is_transmit determines if the signal is transmit
+     * @return true if the signal is Tx
+     */
+    bool is_transmit() const;
 
 protected:
-    SignalDef signal_def;
+    /**
+     * @brief header provides the base header information
+     */
+    SignalHeader header;
 
-    SignalBaseParameters parameters;
-
+    /**
+     * @brief source_type provides the signal source tyep
+     */
     SignalSourceType source_type;
 
 private:
+    /**
+     * @brief updated_time defines the last time that the signal has been updated
+     */
     efis_signals::timestamp_t updated_time;
 };
 
