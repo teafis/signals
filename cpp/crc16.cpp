@@ -15,36 +15,19 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#ifndef TF_SIGNAL_CRC16_H
-#define TF_SIGNAL_CRC16_H
+#include "crc16.h"
 
-#include <cstdint>
-
-namespace efis_signals
+efis_signals::CRC16::CRC16()
 {
-
-/**
- * @brief The CRC16 class provides a CRC16 implementation for networking
- */
-class CRC16
-{
-public:
-    /**
-     * @brief CRC16 constructs and generates parameters required for CRC generation
-     */
-    CRC16();
-
-    /**
-     * @brief compute provides the CRC-16 checksum for the provided data
-     * @param data the data to check
-     * @param size the size of the data to read
-     * @return the associated CRC-16 for the data
-     */
-    uint16_t compute(
-            const uint8_t* data,
-            uint32_t size) const;
-};
-
+    // Empty Constructor
 }
 
-#endif // TF_SIGNAL_CRC16_H
+uint16_t efis_signals::CRC16::compute(
+        const uint8_t* data,
+        uint32_t size) const
+{
+    // TODO - Provide implementation
+    (void)data;
+    (void)size;
+    return 0;
+}
