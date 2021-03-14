@@ -132,7 +132,7 @@ bool get_signal_def_for_name(const std::string& name, SignalDef& signal_def);
  * @param name provides the name of the signal if found
  * @return true if a name for the given signal is found
  */
-bool get_signal_name_for_def(const SignalDef& signal_def, std::string name);
+bool get_signal_name_for_def(const SignalDef& signal_def, std::string& name);
 
 /**
  * @brief get_signal_for_cat_sub_id provides the name of the signal

@@ -140,7 +140,7 @@ bool efis_signals::get_signal_def_for_name(const std::string& name, SignalDef& s
     }
 }
 
-bool efis_signals::get_signal_name_for_def(const SignalDef& signal_def, std::string name)
+bool efis_signals::get_signal_name_for_def(const SignalDef& signal_def, std::string& name)
 {
     if (signal_def == SIGNAL_DEF_NULL)
     {
