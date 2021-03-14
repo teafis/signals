@@ -88,7 +88,9 @@ bool SignalDatabase::write_data_from_dictionary(
     }
     else
     {
-        return base_signal->serialize(writer);
+        return
+                base_signal->get_parameters().write_base(writer) &&
+                base_signal->serialize(writer);
     }
 }
 

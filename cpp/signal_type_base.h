@@ -93,7 +93,9 @@ public:
         source_type(SignalSourceType::Received),
         updated_time(0)
     {
-        // Empty Constructor
+        // Set Base Parameters
+        parameters.cat_id = signal_def.category_id;
+        parameters.sub_id = signal_def.sub_id;
     }
 
     virtual bool serialize(DataWriter&) const
@@ -156,6 +158,10 @@ public:
     void set_updated_time_to_now()
     {
         updated_time = get_millis();
+        if (is_transmit())
+        {
+            parameters.timestamp = get_millis();
+        }
     }
 
     void set_source_type(const SignalSourceType type)
@@ -189,17 +195,9 @@ public:
         }
     }
 
-    bool update_timestamp()
+    const SignalBaseParameters& get_parameters() const
     {
-        if (is_transmit())
-        {
-            parameters.timestamp = get_millis();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return parameters;
     }
 
 protected:

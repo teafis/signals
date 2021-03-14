@@ -90,6 +90,18 @@ size_t DataWriter::bytes_available() const
     }
 }
 
+size_t DataWriter::bytes_written() const
+{
+    if (current < size)
+    {
+        return current;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 void DataWriter::set_buffer(
         uint8_t *const buffer,
         const size_t size)

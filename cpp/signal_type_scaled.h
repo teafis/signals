@@ -22,6 +22,9 @@
 
 #include "data_type_scaled.h"
 
+// TODO - Documentation
+// TODO - Split into CPP file
+
 namespace efis_signals
 {
 
@@ -35,9 +38,18 @@ public:
         // Empty Constructor
     }
 
-    void set_value(const double input)
+    bool set_value(const double input)
     {
-        data.set_value(input);
+        if (is_transmit())
+        {
+            data.set_value(input);
+            set_updated_time_to_now();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     double get_value() const

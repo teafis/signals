@@ -25,6 +25,9 @@ namespace efis_signals
 
 // TODO - Replace with VarArray?
 
+// TODO - Documentation
+// TODO - Split into CPP file
+
 class SignalTypeData : public SignalTypeBase
 {
 public:
@@ -93,9 +96,10 @@ public:
 
     bool set_value(const data_size_t index, const data_t value)
     {
-        if (index < data_size)
+        if (is_transmit() && index < data_size)
         {
             data[index] = value;
+            set_updated_time_to_now();
             return true;
         }
         else

@@ -78,6 +78,12 @@ public:
     size_t bytes_available() const;
 
     /**
+     * @brief bytes_written determines the number of bytes written
+     * @return the number of bytes written to the buffer so far
+     */
+    size_t bytes_written() const;
+
+    /**
      * @brief set_buffer sets or resets buffer information
      * @param buffer is the buffer where data can be written
      * @param size is the overall size of the buffer
