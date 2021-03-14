@@ -22,9 +22,6 @@
 
 #include "data_type_scaled.h"
 
-// TODO - Documentation
-// TODO - Split into CPP file
-
 namespace efis_signals
 {
 
