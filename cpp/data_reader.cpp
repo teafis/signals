@@ -50,7 +50,7 @@ bool DataReader::read_ubyte(uint8_t& val)
 
 bool DataReader::read_ushort(uint16_t& val)
 {
-    uint8_t vals[2];
+    uint8_t vals[2] = {};
 
     if (read_ubyte(vals[0]) && read_ubyte(vals[1]))
     {
@@ -66,7 +66,7 @@ bool DataReader::read_ushort(uint16_t& val)
 
 bool DataReader::read_uint(uint32_t& val)
 {
-    uint8_t vals[4];
+    uint8_t vals[4] = {};
 
     if (read_ubyte(vals[0]) &&
             read_ubyte(vals[1]) &&
