@@ -17,10 +17,10 @@
 
 #include "data_reader.h"
 
-#ifdef __linux__
-#include <arpa/inet.h>
-#elif WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
+#else
+#include <arpa/inet.h>
 #endif
 
 namespace efis_signals
